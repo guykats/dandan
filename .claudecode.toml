@@ -1,0 +1,17 @@
+[project]
+name = "IsraeliKidsMathGame"
+platform = "Android"
+engine = "Unity 2022.3 LTS"
+language = "C#"
+architecture = "Manager-Centric Singleton Pattern"
+
+[rules]
+naming_convention = "PascalCase for classes/methods, camelCase for variables"
+ui_system = "Unity UI (uGUI)"
+input_system = "Input.touchCount / Enhanced Touch"
+performance_target = "Mobile Android (Optimize updates, avoid GC Alloc in Update)"
+
+[ai_behavior]
+ask_for_confirmation = false
+suggest_modular_scripts = true
+auto_create_meta_files = false
