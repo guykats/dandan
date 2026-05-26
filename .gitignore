@@ -38,7 +38,8 @@ ExportedObj/
 *.apk
 *.aab
 
-# Packages — ignore all but not the manifest and lock file
-/[Pp]ackages/
+# Packages — track manifest and lock file, ignore resolved package cache
+/[Pp]ackages/![Pp]ackages/
+/[Pp]ackages/*/
 !/[Pp]ackages/manifest.json
 !/[Pp]ackages/packages-lock.json
