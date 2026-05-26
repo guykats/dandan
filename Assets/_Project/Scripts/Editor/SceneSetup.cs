@@ -172,6 +172,9 @@ public static class SceneSetup
         return tmp;
     }
 
+    private static void StretchFull(GameObject go) =>
+        StretchFull(go.GetComponent<RectTransform>());
+
     private static void StretchFull(RectTransform rt)
     {
         rt.anchorMin = Vector2.zero;
