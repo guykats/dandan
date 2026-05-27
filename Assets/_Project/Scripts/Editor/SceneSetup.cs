@@ -8,6 +8,12 @@ public static class SceneSetup
     [MenuItem("DanDan/Setup Game Scene")]
     public static void SetupGameScene()
     {
+        if (EditorApplication.isPlaying)
+        {
+            Debug.LogError("[SceneSetup] Stop Play Mode before running Setup Game Scene.");
+            return;
+        }
+
         // Empty scene — MapScreen.Awake() builds everything (camera, lights, world)
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
