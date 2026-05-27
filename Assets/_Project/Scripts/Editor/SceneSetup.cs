@@ -86,8 +86,7 @@ public static class SceneSetup
         guiGO.transform.SetParent(canvasGO.transform, false);
         var gameUI = guiGO.AddComponent<GameUI>();
 
-        var buttons    = new Button[4];
-        var answerBtns = new AnswerButton[4];
+        var buttons = new Button[4];
 
         for (int i = 0; i < 4; i++)
         {
@@ -111,10 +110,7 @@ public static class SceneSetup
             StretchFull(lbl.rectTransform);
             lbl.fontStyle = FontStyles.Bold;
 
-            var ab = btnGO.AddComponent<AnswerButton>();
-
-            buttons[i]    = btn;
-            answerBtns[i] = ab;
+            buttons[i] = btn;
         }
 
         // ── Wire serialised references ───────────────────────────────────────
@@ -129,14 +125,6 @@ public static class SceneSetup
         for (int i = 0; i < 4; i++)
             btnsProp.GetArrayElementAtIndex(i).objectReferenceValue = buttons[i];
         guiSO.ApplyModifiedProperties();
-
-        for (int i = 0; i < 4; i++)
-        {
-            var abSO = new SerializedObject(answerBtns[i]);
-            abSO.FindProperty("_index").intValue                  = i;
-            abSO.FindProperty("_gameUI").objectReferenceValue     = gameUI;
-            abSO.ApplyModifiedProperties();
-        }
 
         // ── Save scene ───────────────────────────────────────────────────────
         const string scenePath = "Assets/_Project/Scenes/GameScene.unity";

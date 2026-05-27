@@ -33,6 +33,11 @@ public class GameUI : MonoBehaviour
 
     private void Start()
     {
+        for (int i = 0; i < _answerButtons.Length; i++)
+        {
+            int index = i;
+            _answerButtons[i].onClick.AddListener(() => OnAnswerClicked(index));
+        }
         GameManager.Instance.StartSession();
         _superModeIndicator?.SetActive(false);
         ShowNextQuestion();
