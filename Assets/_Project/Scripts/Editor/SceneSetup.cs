@@ -39,12 +39,14 @@ public static class SceneSetup
         scaler.referenceResolution = new Vector2(1080, 1920);
         canvasGO.AddComponent<GraphicRaycaster>();
 
-        // Background
+        // Background — not interactive, must not block button raycasts
         var bg = MakePanel(canvasGO, "Background", new Color(0.08f, 0.12f, 0.25f));
+        bg.GetComponent<Image>().raycastTarget = false;
         StretchFull(bg);
 
-        // Stats bar (top)
+        // Stats bar (top) — not interactive
         var statsBar = MakePanel(canvasGO, "StatsBar", new Color(0f, 0f, 0f, 0.45f));
+        statsBar.GetComponent<Image>().raycastTarget = false;
         Anchor(statsBar, new Vector2(0f, 0.91f), new Vector2(1f, 1f));
 
         var scoreTMP  = MakeText(statsBar, "ScoreText", "Score: 0", 42);
@@ -55,16 +57,18 @@ public static class SceneSetup
         AnchorWithOffset(streakTMP.rectTransform, new Vector2(0.5f, 0f), new Vector2(1f, 1f), new Vector2(6, 6), new Vector2(-28, -6));
         streakTMP.alignment = TextAlignmentOptions.MidlineRight;
 
-        // Question panel
+        // Question panel — not interactive
         var qPanel = MakePanel(canvasGO, "QuestionPanel", new Color(0.12f, 0.18f, 0.4f, 0.85f));
+        qPanel.GetComponent<Image>().raycastTarget = false;
         Anchor(qPanel, new Vector2(0.04f, 0.63f), new Vector2(0.96f, 0.90f));
 
         var questionTMP = MakeText(qPanel, "QuestionText", "3 + 4 = ?", 80);
         StretchFull(questionTMP.rectTransform);
         questionTMP.fontStyle = FontStyles.Bold;
 
-        // Super mode banner
+        // Super mode banner — not interactive
         var superGO = MakePanel(canvasGO, "SuperModeBanner", new Color(1f, 0.85f, 0.1f, 0.95f));
+        superGO.GetComponent<Image>().raycastTarget = false;
         Anchor(superGO, new Vector2(0.05f, 0.60f), new Vector2(0.95f, 0.63f));
         var superTMP = MakeText(superGO, "SuperText", "** SUPER MODE **", 36);
         StretchFull(superTMP.rectTransform);
@@ -94,12 +98,9 @@ public static class SceneSetup
             var img   = btnGO.AddComponent<Image>();
             img.color = bCol[i];
 
-            var btn    = btnGO.AddComponent<Button>();
+            var btn = btnGO.AddComponent<Button>();
             btn.targetGraphic = img;
-            var clrs   = btn.colors;
-            clrs.highlightedColor = bCol[i] * 1.3f;
-            clrs.pressedColor     = bCol[i] * 0.7f;
-            btn.colors = clrs;
+            btn.transition    = Selectable.Transition.None;
 
             Anchor(btnGO, bMin[i], bMax[i]);
 

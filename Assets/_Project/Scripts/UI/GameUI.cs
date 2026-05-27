@@ -46,6 +46,7 @@ public class GameUI : MonoBehaviour
             int index = i;
             _answerButtons[i].onClick.AddListener(() => OnAnswerClicked(index));
         }
+        Debug.Log("[DanDan] GameUI.Start: " + _answerButtons.Length + " buttons wired");
         GameManager.Instance.StartSession();
         _superModeIndicator.SetActive(false);
         ShowNextQuestion();
@@ -53,6 +54,7 @@ public class GameUI : MonoBehaviour
 
     public void OnAnswerClicked(int index)
     {
+        Debug.Log("[DanDan] OnAnswerClicked: " + index);
         bool ok = int.Parse(_answerButtons[index].GetComponentInChildren<TMP_Text>().text) == _correct;
 
         if (ok) _score += GameManager.Instance.IsSuperMode ? 20 : 10;
