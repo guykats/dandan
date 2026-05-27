@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
 public static class SceneSetup
@@ -19,6 +20,11 @@ public static class SceneSetup
         cam.orthographicSize = 5f;
         cam.clearFlags       = CameraClearFlags.SolidColor;
         cam.backgroundColor  = new Color(0.08f, 0.12f, 0.25f);
+
+        // ── EventSystem ───────────────────────────────────────────────────────
+        var esGO = new GameObject("EventSystem");
+        esGO.AddComponent<EventSystem>();
+        esGO.AddComponent<StandaloneInputModule>();
 
         // ── Managers ──────────────────────────────────────────────────────────
         new GameObject("GameManager").AddComponent<GameManager>();
