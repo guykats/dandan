@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Generic MonoBehaviour Singleton base class for all Managers.
-/// Usage: public class MyManager : Singleton&lt;MyManager&gt; { }
-/// </summary>
 public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
     private static T _instance;
@@ -14,10 +10,10 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         {
             if (_instance == null)
             {
-                _instance = FindFirstObjectByType<T>();
+                _instance = FindObjectOfType<T>();
                 if (_instance == null)
                 {
-                    GameObject obj = new GameObject(typeof(T).Name);
+                    var obj = new GameObject(typeof(T).Name);
                     _instance = obj.AddComponent<T>();
                 }
             }
@@ -32,7 +28,6 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
         _instance = this as T;
         DontDestroyOnLoad(gameObject);
     }
