@@ -98,6 +98,7 @@ public static class SceneSetup
             img.color = bCol[i];
 
             var btn    = btnGO.AddComponent<Button>();
+            btn.targetGraphic = img;
             var clrs   = btn.colors;
             clrs.highlightedColor = bCol[i] * 1.3f;
             clrs.pressedColor     = bCol[i] * 0.7f;
@@ -106,6 +107,7 @@ public static class SceneSetup
             Anchor(btnGO, bMin[i], bMax[i]);
 
             var lbl = MakeText(btnGO, "Label", "?", 72);
+            lbl.raycastTarget = false;
             StretchFull(lbl.rectTransform);
             lbl.fontStyle = FontStyles.Bold;
 
