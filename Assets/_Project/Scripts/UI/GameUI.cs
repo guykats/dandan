@@ -9,8 +9,7 @@ public class GameUI : MonoBehaviour
     [SerializeField] private TMP_Text _questionText;
 
     [Header("Answer Buttons")]
-    [SerializeField] private Button[]   _answerButtons;
-    [SerializeField] private TMP_Text[] _answerTexts;
+    [SerializeField] private Button[] _answerButtons;
 
     [Header("Stats")]
     [SerializeField] private TMP_Text  _streakText;
@@ -41,7 +40,7 @@ public class GameUI : MonoBehaviour
 
     public void OnAnswerClicked(int index)
     {
-        bool ok = int.Parse(_answerTexts[index].text) == _correct;
+        bool ok = int.Parse(_answerButtons[index].GetComponentInChildren<TMP_Text>().text) == _correct;
 
         if (ok) _score += GameManager.Instance.IsSuperMode ? 20 : 10;
         _scoreText.text = $"Score: {_score}";
@@ -65,8 +64,8 @@ public class GameUI : MonoBehaviour
         var q      = QuestionGenerator.Instance.Next();
         _correct   = q.CorrectAnswer;
         _questionText.text = q.Text;
-        for (int i = 0; i < _answerTexts.Length; i++)
-            _answerTexts[i].text = q.Choices[i].ToString();
+        for (int i = 0; i < _answerButtons.Length; i++)
+            _answerButtons[i].GetComponentInChildren<TMP_Text>().text = q.Choices[i].ToString();
     }
 
     private void HandleStreak(int s)   => _streakText.text = s > 0 ? $"Streak: {s} !" : "Streak: 0";

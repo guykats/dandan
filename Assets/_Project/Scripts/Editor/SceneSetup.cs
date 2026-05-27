@@ -86,9 +86,8 @@ public static class SceneSetup
         guiGO.transform.SetParent(canvasGO.transform, false);
         var gameUI = guiGO.AddComponent<GameUI>();
 
-        var buttons     = new Button[4];
-        var buttonTexts = new TMP_Text[4];
-        var answerBtns  = new AnswerButton[4];
+        var buttons    = new Button[4];
+        var answerBtns = new AnswerButton[4];
 
         for (int i = 0; i < 4; i++)
         {
@@ -112,9 +111,8 @@ public static class SceneSetup
 
             var ab = btnGO.AddComponent<AnswerButton>();
 
-            buttons[i]     = btn;
-            buttonTexts[i] = lbl;
-            answerBtns[i]  = ab;
+            buttons[i]    = btn;
+            answerBtns[i] = ab;
         }
 
         // ── Wire serialised references ───────────────────────────────────────
@@ -125,13 +123,9 @@ public static class SceneSetup
         guiSO.FindProperty("_superModeIndicator").objectReferenceValue = superGO;
 
         var btnsProp = guiSO.FindProperty("_answerButtons");
-        var txtsProp = guiSO.FindProperty("_answerTexts");
-        btnsProp.arraySize = txtsProp.arraySize = 4;
+        btnsProp.arraySize = 4;
         for (int i = 0; i < 4; i++)
-        {
             btnsProp.GetArrayElementAtIndex(i).objectReferenceValue = buttons[i];
-            txtsProp.GetArrayElementAtIndex(i).objectReferenceValue = buttonTexts[i];
-        }
         guiSO.ApplyModifiedProperties();
 
         for (int i = 0; i < 4; i++)
