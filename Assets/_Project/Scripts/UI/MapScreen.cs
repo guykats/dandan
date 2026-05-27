@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
-using RTLTMPro;
 
 /// <summary>
 /// Builds the 3D map screen entirely at runtime.
@@ -323,7 +322,7 @@ public class MapScreen : MonoBehaviour
         numGO.transform.SetPositionAndRotation(
             O + new Vector3(0, orbY + 0.02f, -0.55f),
             _cam.transform.rotation);
-        var numTMP = numGO.AddComponent<RTLTextMeshPro>();
+        var numTMP = numGO.AddComponent<TextMeshPro>();
         numTMP.text      = unlocked ? level.ToString() : "🔒";
         numTMP.fontSize  = unlocked ? 4.8f : 3.8f;
         numTMP.fontStyle = FontStyles.Bold;
@@ -341,7 +340,7 @@ public class MapScreen : MonoBehaviour
         badgeGO.transform.SetPositionAndRotation(
             O + new Vector3(0.58f, orbY + 0.58f, -0.60f),
             _cam.transform.rotation);
-        var badgeTMP = badgeGO.AddComponent<RTLTextMeshPro>();
+        var badgeTMP = badgeGO.AddComponent<TextMeshPro>();
         badgeTMP.text      = opStr;
         badgeTMP.fontSize  = 3.2f;
         badgeTMP.fontStyle = FontStyles.Bold;
@@ -354,7 +353,8 @@ public class MapScreen : MonoBehaviour
         lblGO.transform.SetPositionAndRotation(
             O + new Vector3(0, 0.42f, -0.45f),
             _cam.transform.rotation);
-        var lblTMP = lblGO.AddComponent<RTLTextMeshPro>();
+        var lblTMP = lblGO.AddComponent<TextMeshPro>();
+        lblTMP.isRightToLeftText = true;
         lblTMP.text      = opLabel;
         lblTMP.fontSize  = 2.2f;
         lblTMP.color     = new UnityEngine.Color(1f, 1f, 1f, 0.75f);
@@ -389,7 +389,7 @@ public class MapScreen : MonoBehaviour
 
         UI_TMP(cvGO, "Title", "מפת המסע", 76f, FontStyles.Bold,
                UnityEngine.Color.white, TextAlignmentOptions.Center,
-               new Vector2(0.10f, 0.916f), new Vector2(0.90f, 0.995f));
+               new Vector2(0.10f, 0.916f), new Vector2(0.90f, 0.995f), rtl: true);
 
         UI_TMP(cvGO, "Stars", "★  0", 52f, FontStyles.Bold,
                CGold, TextAlignmentOptions.Right,
@@ -500,17 +500,19 @@ public class MapScreen : MonoBehaviour
     static void UI_TMP(GameObject parent, string name, string text,
                        float size, FontStyles style,
                        UnityEngine.Color col, TextAlignmentOptions align,
-                       Vector2 anchorMin, Vector2 anchorMax)
+                       Vector2 anchorMin, Vector2 anchorMax,
+                       bool rtl = false)
     {
         var go  = new GameObject(name);
         go.transform.SetParent(parent.transform, false);
-        var tmp = go.AddComponent<RTLTextMeshProUGUI>();
-        tmp.text      = text;
-        tmp.fontSize  = size;
-        tmp.fontStyle = style;
-        tmp.color     = col;
-        tmp.alignment = align;
-        tmp.raycastTarget = false;
+        var tmp = go.AddComponent<TextMeshProUGUI>();
+        tmp.text               = text;
+        tmp.fontSize           = size;
+        tmp.fontStyle          = style;
+        tmp.color              = col;
+        tmp.alignment          = align;
+        tmp.isRightToLeftText  = rtl;
+        tmp.raycastTarget      = false;
         var rt  = go.GetComponent<RectTransform>();
         rt.anchorMin = anchorMin;
         rt.anchorMax = anchorMax;
