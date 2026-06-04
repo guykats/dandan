@@ -14,17 +14,25 @@ public static class SceneSetup
             return;
         }
 
-        // Empty scene — MapScreen.Awake() builds everything (camera, lights, world)
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
-        var go = new GameObject("MapScreen");
-        go.AddComponent<MapScreen>();
+        // Camera
+        var camGO = new GameObject("Main Camera");
+        var cam   = camGO.AddComponent<Camera>();
+        cam.clearFlags      = CameraClearFlags.SolidColor;
+        cam.backgroundColor = new Color(0.13f, 0.18f, 0.35f);
+        cam.orthographic    = true;
+        camGO.tag = "MainCamera";
+
+        // MapScreen host — builds all UI at runtime
+        var mapGO = new GameObject("MapScreen");
+        mapGO.AddComponent<MapScreen>();
 
         System.IO.Directory.CreateDirectory("Assets/_Project/Scenes");
         EditorSceneManager.SaveScene(scene, "Assets/_Project/Scenes/GameScene.unity");
         AssetDatabase.Refresh();
 
-        Debug.Log("[SceneSetup] 3D GameScene created. Press Play to test.");
+        Debug.Log("[SceneSetup] GameScene created. Press Play to test.");
     }
 }
 #endif
