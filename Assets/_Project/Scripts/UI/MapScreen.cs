@@ -3,10 +3,12 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// Builds the entire 2D map screen at runtime — no prefabs, no serialized refs.
-/// Everything created and wired in Awake().
+/// Click detection uses RectTransformUtility.RectangleContainsScreenPoint so it
+/// works regardless of EventSystem / input-handling configuration.
 /// </summary>
 public class MapScreen : MonoBehaviour
 {
@@ -14,6 +16,11 @@ public class MapScreen : MonoBehaviour
     private RectTransform _glowRT;
     private Image         _glowImg;
     private float         _glowBase;
+
+    // Click detection — keyed by level number
+    private readonly Dictionary<int, RectTransform> _nodeRects  = new();
+    private readonly Dictionary<int, Image>         _nodeImages = new();
+    private readonly bool[] _unlocked = { true, false, false, false, false, false };
 
     // ── Palette ──────────────────────────────────────────────────────────────
     static readonly Color CSky0  = new Color(0.10f, 0.25f, 0.62f);
@@ -232,7 +239,7 @@ public class MapScreen : MonoBehaviour
     void BuildNode(GameObject map, int idx)
     {
         int   level    = idx + 1;
-        bool  unlocked = level == 1;
+        bool  unlocked = _unlocked[idx];
         bool  isAdd    = level <= 3;
         Color col      = unlocked ? CNode[idx] : CLock;
 
@@ -271,17 +278,21 @@ public class MapScreen : MonoBehaviour
         shRT.sizeDelta = Vector2.one * NodeDiameter;
         shRT.anchoredPosition = new Vector2(ShadowShift, -ShadowShift);
 
-        // Main circle — button hit target
+        // Main circle — hit target
         var main    = new GameObject("Circle");
         main.transform.SetParent(root.transform, false);
         var mainImg = main.AddComponent<Image>();
         mainImg.sprite = _circle;
         mainImg.color  = col;
-        mainImg.raycastTarget = true;
+        mainImg.raycastTarget = false; // we do our own hit-testing in Update()
         var mainRT  = main.GetComponent<RectTransform>();
         mainRT.anchorMin = mainRT.anchorMax = new Vector2(0.5f, 0.5f);
         mainRT.sizeDelta = Vector2.one * NodeDiameter;
         mainRT.anchoredPosition = Vector2.zero;
+
+        // Register for click detection
+        _nodeRects[level]  = mainRT;
+        _nodeImages[level] = mainImg;
 
         // Inner highlight
         var hl    = new GameObject("Highlight");
@@ -353,13 +364,34 @@ public class MapScreen : MonoBehaviour
         lblRT.sizeDelta = new Vector2(NodeDiameter, 36f);
         lblRT.anchoredPosition = new Vector2(0f, -(NodeDiameter * 0.5f + 62f));
 
-        // Button
-        var btn = main.AddComponent<Button>();
-        btn.targetGraphic = mainImg;
-        btn.transition    = Selectable.Transition.ColorTint;
-        if (!unlocked) btn.interactable = false;
-        int cap = level;
-        btn.onClick.AddListener(() => OnLevelClicked(cap));
+    }
+
+    // ── Input (no EventSystem dependency) ────────────────────────────────────
+
+    void Update()
+    {
+        if (!TryGetClickPos(out Vector2 pos)) return;
+
+        foreach (var kv in _nodeRects)
+        {
+            int level = kv.Key;
+            if (!_unlocked[level - 1]) continue;
+            if (RectTransformUtility.RectangleContainsScreenPoint(kv.Value, pos, null))
+            {
+                OnLevelClicked(level);
+                return;
+            }
+        }
+    }
+
+    static bool TryGetClickPos(out Vector2 pos)
+    {
+        if (Input.GetMouseButtonDown(0))       { pos = Input.mousePosition; return true; }
+        if (Input.touchCount > 0 &&
+            Input.GetTouch(0).phase == TouchPhase.Began)
+                                               { pos = Input.GetTouch(0).position; return true; }
+        pos = default;
+        return false;
     }
 
     // ── Glow pulse ────────────────────────────────────────────────────────────
@@ -384,7 +416,17 @@ public class MapScreen : MonoBehaviour
     void OnLevelClicked(int level)
     {
         Debug.Log($"[MapScreen] Level {level} clicked!");
+        if (_nodeImages.TryGetValue(level, out var img))
+            StartCoroutine(FlashNode(img));
         // TODO: load game scene for this level
+    }
+
+    IEnumerator FlashNode(Image img)
+    {
+        Color orig = img.color;
+        img.color = Color.white;
+        yield return new WaitForSeconds(0.12f);
+        img.color = orig;
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
