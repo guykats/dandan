@@ -1,0 +1,14 @@
+{
+    "name": "דנדן - חשבון לכיתה א'",
+    "short_name": "דנדן",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#e0f2fe",
+    "theme_color": "#38bdf8",
+    "lang": "he",
+    "dir": "rtl",
+    "icons": [
+        { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+    ]
+}
