@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Game\Curriculum;
+use App\Game\GameService;
 use App\Models\Attempt;
 use App\Models\KidProfile;
 use App\Models\Round;
+use App\Models\StationProgress;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,38 +32,43 @@ class ParentController extends Controller
         $finished = Round::query()->finished();
         $attempts = Attempt::query()->whereHas('round', fn ($q) => $q->finished());
 
-        $byOperation = (clone $attempts)
-            ->select('operation', DB::raw('COUNT(*) as total'), DB::raw('SUM(CASE WHEN correct_first_try THEN 1 ELSE 0 END) as correct'))
-            ->groupBy('operation')
+        $bySkill = (clone $attempts)
+            ->select('skill', DB::raw('COUNT(*) as total'), DB::raw('SUM(CASE WHEN correct_first_try THEN 1 ELSE 0 END) as correct'))
+            ->groupBy('skill')
             ->get()
-            ->mapWithKeys(fn ($row) => [$row->operation => [
+            ->mapWithKeys(fn ($row) => [$row->skill => [
                 'total' => (int) $row->total,
                 'correct' => (int) $row->correct,
             ]]);
 
         $toughest = (clone $attempts)
-            ->select('operation', 'a', 'b', DB::raw('COUNT(*) as seen'), DB::raw('SUM(mistakes) as mistakes'))
+            ->select('label', DB::raw('COUNT(*) as seen'), DB::raw('SUM(mistakes) as mistakes'))
             ->where('mistakes', '>', 0)
-            ->groupBy('operation', 'a', 'b')
+            ->whereNotNull('label')
+            ->groupBy('label')
             ->orderByDesc('mistakes')
             ->limit(8)
             ->get()
             ->map(fn ($row) => [
-                'label' => "{$row->a} {$row->operation} {$row->b}",
+                'label' => $row->label,
                 'seen' => (int) $row->seen,
                 'mistakes' => (int) $row->mistakes,
             ]);
+
+        $journey = app(GameService::class)->journey();
+        $passed = collect($journey['stations'])->where('bestStars', '>=', 1);
 
         $recentRounds = (clone $finished)
             ->latest('finished_at')
             ->latest('id')
             ->limit(15)
-            ->get(['id', 'level', 'size', 'correct_first_try', 'finished_at'])
+            ->get(['id', 'station', 'size', 'correct_first_try', 'finished_at'])
             ->reverse()
             ->values()
             ->map(fn (Round $r) => [
                 'id' => $r->id,
-                'level' => $r->level,
+                'station' => $r->station,
+                'stationTitle' => Curriculum::find($r->station)['title'] ?? '',
                 'size' => $r->size,
                 'correct' => $r->correct_first_try,
                 'finishedAt' => $r->finished_at->toIso8601String(),
@@ -68,13 +76,21 @@ class ParentController extends Controller
 
         return Inertia::render('Parent', [
             'profile' => [
-                'level' => $profile->level,
                 'stars' => $profile->stars,
                 'stickers' => $profile->stickersUnlocked(),
             ],
+            'journey' => [
+                'current' => $journey['current'],
+                'currentTitle' => Curriculum::find($journey['current'])['title'],
+                'passed' => $passed->count(),
+                'stationStars' => $passed->sum('bestStars'),
+                'total' => Curriculum::count(),
+                'stations' => collect($journey['stations'])->map(fn ($s) => ['id' => $s['id'], 'title' => $s['title'], 'world' => $s['world']])->all(),
+            ],
+            'worlds' => Curriculum::WORLDS,
             'stats' => [
                 'rounds' => (clone $finished)->count(),
-                'byOperation' => $byOperation,
+                'bySkill' => $bySkill,
                 'toughest' => $toughest,
                 'recentRounds' => $recentRounds,
             ],
@@ -121,15 +137,13 @@ class ParentController extends Controller
         return redirect()->route('home');
     }
 
-    public function setLevel(Request $request): RedirectResponse
+    public function unlockTo(Request $request, GameService $game): RedirectResponse
     {
         $validated = $request->validate([
-            'level' => ['required', 'integer', 'in:'.implode(',', config('dandan.levels'))],
+            'station' => ['required', 'integer', 'min:1', 'max:'.Curriculum::count()],
         ]);
 
-        $profile = KidProfile::current();
-        $profile->setLevel((int) $validated['level']);
-        $profile->save();
+        $game->unlockUpTo((int) $validated['station']);
 
         return back();
     }
@@ -139,6 +153,7 @@ class ParentController extends Controller
         DB::transaction(function () {
             Attempt::query()->delete();
             Round::query()->delete();
+            StationProgress::query()->delete();
             KidProfile::query()->delete();
         });
 

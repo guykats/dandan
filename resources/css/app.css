@@ -36,28 +36,30 @@ button {
   cursor: pointer;
 }
 
-/* Chunky "toy" button: a solid bottom edge that squashes on press. */
-.toy-btn {
-  border-radius: 1.5rem;
-  border: 0;
-  box-shadow: 0 6px 0 rgba(12, 74, 110, 0.25);
-  transition: transform 80ms ease, box-shadow 80ms ease, filter 120ms ease;
-}
-.toy-btn:hover:not(:disabled) {
-  filter: brightness(1.05);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 0 rgba(12, 74, 110, 0.25);
-}
-.toy-btn:active:not(:disabled) {
-  transform: translateY(4px);
-  box-shadow: 0 2px 0 rgba(12, 74, 110, 0.25);
-}
-.toy-btn:disabled {
-  cursor: default;
-}
-.toy-btn:focus-visible {
-  outline: 4px solid #0ea5e9;
-  outline-offset: 3px;
+@layer components {
+  /* Chunky "toy" button: a solid bottom edge that squashes on press. */
+  .toy-btn {
+    border-radius: 1.5rem;
+    border: 0;
+    box-shadow: 0 6px 0 rgba(12, 74, 110, 0.25);
+    transition: transform 80ms ease, box-shadow 80ms ease, filter 120ms ease;
+  }
+  .toy-btn:hover:not(:disabled) {
+    filter: brightness(1.05);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 0 rgba(12, 74, 110, 0.25);
+  }
+  .toy-btn:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 rgba(12, 74, 110, 0.25);
+  }
+  .toy-btn:disabled {
+    cursor: default;
+  }
+  .toy-btn:focus-visible {
+    outline: 4px solid #0ea5e9;
+    outline-offset: 3px;
+  }
 }
 
 @keyframes float {

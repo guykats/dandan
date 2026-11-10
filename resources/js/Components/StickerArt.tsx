@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react';
 
-export type WorldId = 'sea' | 'savanna' | 'jungle';
+export type WorldId = 'sea' | 'savanna' | 'jungle' | 'mountains' | 'sky';
 
 export const WORLDS: { id: WorldId; name: string; bg: string }[] = [
     { id: 'sea', name: 'עולם הים', bg: 'from-sky-300 to-blue-500' },
     { id: 'savanna', name: 'הסוואנה', bg: 'from-amber-200 to-orange-400' },
     { id: 'jungle', name: 'הג׳ונגל', bg: 'from-lime-300 to-emerald-600' },
+    { id: 'mountains', name: 'ההרים', bg: 'from-indigo-200 to-indigo-500' },
+    { id: 'sky', name: 'השמיים', bg: 'from-sky-400 to-cyan-200' },
 ];
 
 /** Cute shared eyes: white, pupil, shine. */
@@ -202,6 +204,122 @@ export const STICKERS: { id: string; name: string; world: WorldId; art: ReactNod
                 <circle cx="26" cy="40" r="7" fill="#fde047" /><circle cx="74" cy="40" r="7" fill="#fde047" />
                 <rect x="44" y="30" width="12" height="52" rx="6" fill="#7c3aed" />
                 <Eyes x1={47} x2={53} y={36} r={3.5} />
+            </g>
+        ),
+    },
+    // Mountains
+    {
+        id: 'goat', name: 'יעל', world: 'mountains',
+        art: (
+            <g>
+                <path d="M34 26 q-14 -16 -6 -22 q4 10 14 16 M66 26 q14 -16 6 -22 q-4 10 -14 16" fill="#a8a29e" />
+                <ellipse cx="22" cy="40" rx="10" ry="5" fill="#e7e5e4" transform="rotate(-20 22 40)" />
+                <ellipse cx="78" cy="40" rx="10" ry="5" fill="#e7e5e4" transform="rotate(20 78 40)" />
+                <path d="M30 34 C 30 20, 70 20, 70 34 L 64 70 C 60 82, 40 82, 36 70 Z" fill="#f5f5f4" />
+                <ellipse cx="50" cy="72" rx="12" ry="9" fill="#fecdd3" />
+                <path d="M46 82 q4 12 8 0" fill="#e7e5e4" />
+                <Eyes x1={40} x2={60} y={44} r={6} />
+            </g>
+        ),
+    },
+    {
+        id: 'bear', name: 'דוב', world: 'mountains',
+        art: (
+            <g>
+                <circle cx="26" cy="26" r="12" fill="#92400e" /><circle cx="74" cy="26" r="12" fill="#92400e" />
+                <circle cx="26" cy="26" r="6" fill="#fcd34d" /><circle cx="74" cy="26" r="6" fill="#fcd34d" />
+                <circle cx="50" cy="52" r="32" fill="#b45309" />
+                <ellipse cx="50" cy="64" rx="15" ry="12" fill="#fde68a" />
+                <ellipse cx="50" cy="58" rx="5" ry="4" fill="#1f2937" />
+                <Smile x={50} y={66} w={8} />
+                <Eyes x1={38} x2={62} y={46} r={6} />
+                <Cheeks x1={30} x2={70} y={60} />
+            </g>
+        ),
+    },
+    {
+        id: 'fox', name: 'שועל', world: 'mountains',
+        art: (
+            <g>
+                <path d="M22 16 l12 26 l-20 -4 z M78 16 l-12 26 l20 -4 z" fill="#ea580c" />
+                <path d="M18 38 C 22 70, 40 84, 50 84 C 60 84, 78 70, 82 38 C 70 30, 30 30, 18 38 Z" fill="#f97316" />
+                <path d="M30 56 C 36 76, 64 76, 70 56 C 62 64, 38 64, 30 56 Z" fill="#fff7ed" />
+                <circle cx="50" cy="74" r="4" fill="#1f2937" />
+                <Eyes x1={38} x2={62} y={50} r={5.5} />
+            </g>
+        ),
+    },
+    {
+        id: 'penguin', name: 'פינגווין', world: 'mountains',
+        art: (
+            <g>
+                <ellipse cx="50" cy="56" rx="28" ry="34" fill="#1e293b" />
+                <ellipse cx="50" cy="62" rx="19" ry="26" fill="#f8fafc" />
+                <ellipse cx="24" cy="60" rx="7" ry="16" fill="#1e293b" transform="rotate(15 24 60)" />
+                <ellipse cx="76" cy="60" rx="7" ry="16" fill="#1e293b" transform="rotate(-15 76 60)" />
+                <path d="M44 44 l6 8 l6 -8 z" fill="#f59e0b" />
+                <ellipse cx="40" cy="90" rx="8" ry="4" fill="#f59e0b" /><ellipse cx="60" cy="90" rx="8" ry="4" fill="#f59e0b" />
+                <Eyes x1={42} x2={58} y={36} r={5} />
+                <Cheeks x1={34} x2={66} y={46} />
+            </g>
+        ),
+    },
+    // Sky
+    {
+        id: 'owl', name: 'ינשוף', world: 'sky',
+        art: (
+            <g>
+                <path d="M26 22 l8 14 h-14 z M74 22 l-8 14 h14 z" fill="#78716c" />
+                <ellipse cx="50" cy="56" rx="30" ry="34" fill="#a8a29e" />
+                <ellipse cx="50" cy="66" rx="18" ry="20" fill="#e7e5e4" />
+                <circle cx="38" cy="44" r="12" fill="#fff" /><circle cx="62" cy="44" r="12" fill="#fff" />
+                <circle cx="38" cy="45" r="7" fill="#1f2937" /><circle cx="62" cy="45" r="7" fill="#1f2937" />
+                <circle cx="40" cy="42" r="2.5" fill="#fff" /><circle cx="64" cy="42" r="2.5" fill="#fff" />
+                <path d="M46 54 l4 7 l4 -7 z" fill="#f59e0b" />
+            </g>
+        ),
+    },
+    {
+        id: 'ladybug', name: 'פרת משה רבנו', world: 'sky',
+        art: (
+            <g>
+                <path d="M42 20 q-6 -10 -12 -10 M58 20 q6 -10 12 -10" stroke="#1f2937" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+                <circle cx="50" cy="58" r="32" fill="#ef4444" />
+                <path d="M50 26 v64" stroke="#1f2937" strokeWidth="3" />
+                {[[34, 46], [66, 46], [30, 66], [70, 66], [40, 82], [60, 82]].map(([x, y]) => (
+                    <circle key={`${x}-${y}`} cx={x} cy={y} r="5" fill="#1f2937" />
+                ))}
+                <circle cx="50" cy="28" r="14" fill="#1f2937" />
+                <Eyes x1={45} x2={55} y={27} r={4} />
+            </g>
+        ),
+    },
+    {
+        id: 'bee', name: 'דבורה', world: 'sky',
+        art: (
+            <g>
+                <ellipse cx="34" cy="30" rx="14" ry="18" fill="#e0f2fe" opacity="0.9" transform="rotate(-20 34 30)" />
+                <ellipse cx="66" cy="30" rx="14" ry="18" fill="#e0f2fe" opacity="0.9" transform="rotate(20 66 30)" />
+                <ellipse cx="50" cy="60" rx="30" ry="24" fill="#facc15" />
+                <path d="M40 38 q-4 22 0 44 M58 38 q4 22 0 44" stroke="#1f2937" strokeWidth="7" fill="none" />
+                <path d="M80 60 l10 0" stroke="#1f2937" strokeWidth="4" strokeLinecap="round" />
+                <circle cx="26" cy="58" r="14" fill="#facc15" />
+                <Eyes x1={22} x2={30.01} y={55} r={4.5} />
+                <Smile x={25} y={64} w={6} />
+            </g>
+        ),
+    },
+    {
+        id: 'bird', name: 'ציפור', world: 'sky',
+        art: (
+            <g>
+                <path d="M30 60 q-20 -10 -24 -30 q20 0 34 18 z" fill="#0ea5e9" />
+                <ellipse cx="52" cy="58" rx="28" ry="24" fill="#38bdf8" />
+                <ellipse cx="56" cy="66" rx="16" ry="12" fill="#e0f2fe" />
+                <path d="M78 50 l14 4 l-14 6 z" fill="#f59e0b" />
+                <path d="M54 30 q4 -10 12 -8 q-4 4 -4 10" fill="#0284c7" />
+                <Eyes x1={62} x2={70} y={48} r={5} />
+                <path d="M46 82 v8 M58 82 v8" stroke="#f59e0b" strokeWidth="3" strokeLinecap="round" />
             </g>
         ),
     },

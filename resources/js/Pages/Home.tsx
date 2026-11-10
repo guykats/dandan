@@ -7,9 +7,13 @@ import TopBar from '../Components/TopBar';
 import { speak } from '../lib/speech';
 import type { SharedProps } from '../types';
 
-const GREETING = 'היי! אני דנדן הנשר. בוא נפתור תרגילים ונאסוף כוכבים!';
+const GREETING = 'היי! אני דנדן הנשר. בוא נצא למסע ונפתור תרגילים בדרך!';
 
-export default function Home() {
+interface Props {
+    current: { id: number; title: string; world: number };
+}
+
+export default function Home({ current }: Props) {
     const { kid, starsPerSticker } = usePage<SharedProps>().props;
     const [mood, setMood] = useState<EagleMood>('idle');
 
@@ -35,22 +39,27 @@ export default function Home() {
                     <SpeechBubble>
                         היי! אני <b>דנדן</b> 🦅
                         <br />
-                        בוא נפתור תרגילים ונאסוף כוכבים!
+                        בוא נצא למסע ונפתור תרגילים בדרך!
                     </SpeechBubble>
                 </div>
 
-                <Link
-                    href="/play"
-                    onClick={() => speak('יוצאים לדרך!')}
-                    className="toy-btn animate-pop bg-amber-400 px-16 py-6 text-5xl font-extrabold text-sky-950"
-                >
-                    בוא נשחק! ▶
-                </Link>
+                <div className="flex flex-col items-center gap-4">
+                    <Link
+                        href="/journey"
+                        onClick={() => speak('יוצאים למסע!')}
+                        className="toy-btn animate-pop bg-amber-400 px-16 py-6 text-5xl font-extrabold text-sky-950"
+                    >
+                        🗺️ המסע של דנדן
+                    </Link>
+                    <Link href={`/play/${current.id}`} onClick={() => speak(current.title)} className="toy-btn bg-emerald-400 px-8 py-3 text-2xl font-bold text-white">
+                        להמשיך: תחנה {current.id} · {current.title} ▶
+                    </Link>
+                </div>
 
                 <Link href="/stickers" className="toy-btn flex items-center gap-4 bg-white px-8 py-4 text-2xl font-bold text-sky-800">
                     <span>📒 האוסף שלי</span>
                     <span className="flex items-center gap-2 text-lg font-semibold text-sky-700">
-                        {kid.stickers} / {STICKERS.length}
+                        {kid.stickers} מתוך {STICKERS.length}
                     </span>
                     {!allCollected && (
                         <span className="h-3 w-32 overflow-hidden rounded-full bg-sky-100" title={`עוד ${starsPerSticker - towardNext} כוכבים למדבקה הבאה`}>

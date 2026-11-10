@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\KidProfile;
 use App\Models\Round;
+use App\Models\StationProgress;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
@@ -61,21 +62,21 @@ class ParentAreaTest extends TestCase
     public function test_actions_are_forbidden_while_locked(): void
     {
         $this->post('/parent/reset')->assertForbidden();
-        $this->post('/parent/level', ['level' => 20])->assertForbidden();
+        $this->post('/parent/unlock-to', ['station' => 20])->assertForbidden();
     }
 
-    public function test_parent_can_change_level_and_reset(): void
+    public function test_parent_can_unlock_stations_and_reset(): void
     {
         $this->post('/parent/unlock', ['pin' => '4321']);
 
-        $this->post('/parent/level', ['level' => 20])->assertRedirect();
-        $this->assertSame(20, KidProfile::current()->level);
-
-        $this->get('/play');
-        $this->assertSame(1, Round::count());
+        $this->post('/parent/unlock-to', ['station' => 17])->assertRedirect();
+        $this->get('/play/17')->assertOk();
+        $this->get('/play/18')->assertRedirect('/journey');
+        $this->assertSame(16, StationProgress::count());
 
         $this->post('/parent/reset')->assertRedirect();
         $this->assertSame(0, Round::count());
-        $this->assertSame(10, KidProfile::current()->level);
+        $this->assertSame(0, StationProgress::count());
+        $this->assertSame(0, KidProfile::current()->stars);
     }
 }

@@ -28,14 +28,13 @@ class HandleInertiaRequests extends Middleware
     }
 
     /**
-     * @return array{level: int, stars: int, stickers: int}
+     * @return array{stars: int, stickers: int}
      */
     private function kid(): array
     {
         $profile = KidProfile::current();
 
         return [
-            'level' => $profile->level,
             'stars' => $profile->stars,
             'stickers' => $profile->stickersUnlocked(),
         ];

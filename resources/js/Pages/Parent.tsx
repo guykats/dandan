@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { hebrewVoice, isSpeechSupported, onVoicesReady, speak } from '../lib/speech';
+import type { World } from '../types';
 
 interface OperationStats {
     total: number;
@@ -9,17 +10,27 @@ interface OperationStats {
 
 interface RecentRound {
     id: number;
-    level: number;
+    station: number;
+    stationTitle: string;
     size: number;
     correct: number;
     finishedAt: string;
 }
 
 interface Props {
-    profile: { level: number; stars: number; stickers: number };
+    profile: { stars: number; stickers: number };
+    journey: {
+        current: number;
+        currentTitle: string;
+        passed: number;
+        stationStars: number;
+        total: number;
+        stations: { id: number; title: string; world: number }[];
+    };
+    worlds: World[];
     stats: {
         rounds: number;
-        byOperation: Partial<Record<'+' | '-', OperationStats>>;
+        bySkill: Partial<Record<string, OperationStats>>;
         toughest: { label: string; seen: number; mistakes: number }[];
         recentRounds: RecentRound[];
     };
@@ -69,7 +80,7 @@ function RecentRoundsChart({ rounds }: { rounds: RecentRound[] }) {
                         {hover === i && (
                             <div className="absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-3 py-2 text-xs text-white shadow" dir="rtl">
                                 <div className="font-semibold">{r.correct} מתוך {r.size} בניסיון ראשון</div>
-                                <div className="text-slate-300">{dateFormat.format(new Date(r.finishedAt))} · עד {r.level}</div>
+                                <div className="text-slate-300">{dateFormat.format(new Date(r.finishedAt))} · תחנה {r.station}: {r.stationTitle}</div>
                             </div>
                         )}
                     </div>
@@ -112,10 +123,18 @@ function VoiceCheck() {
     );
 }
 
-export default function Parent({ profile, stats, unlockMinutes }: Props) {
+const SKILLS: { key: string; label: string }[] = [
+    { key: 'count', label: 'ספירה' },
+    { key: 'add', label: 'חיבור' },
+    { key: 'sub', label: 'חיסור' },
+    { key: 'missing', label: 'מספר חסר' },
+    { key: 'compare', label: 'השוואה' },
+    { key: 'sequence', label: 'סדרות' },
+];
+
+export default function Parent({ profile, journey, worlds, stats, unlockMinutes }: Props) {
     const [confirmReset, setConfirmReset] = useState(false);
-    const plus = stats.byOperation['+'];
-    const minus = stats.byOperation['-'];
+    const [unlockTarget, setUnlockTarget] = useState(journey.current);
 
     return (
         <div className="min-h-screen bg-slate-100 text-slate-900">
@@ -132,11 +151,27 @@ export default function Parent({ profile, stats, unlockMinutes }: Props) {
                 </header>
                 <p className="mb-6 text-sm text-slate-500">המסך ננעל אוטומטית אחרי {unlockMinutes} דקות.</p>
 
-                <section className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+                <section className="mb-4 grid grid-cols-2 gap-4 md:grid-cols-4">
+                    <Tile label="תחנה נוכחית" value={journey.current} sub={journey.currentTitle} />
+                    <Tile label="תחנות שעברו" value={`${journey.passed} מתוך ${journey.total}`} sub={`${journey.stationStars} כוכבי תחנות מתוך ${journey.total * 3}`} />
                     <Tile label="סבבים שהושלמו" value={stats.rounds} />
-                    <Tile label="הצלחה בחיבור" value={percent(plus)} sub={plus ? `${plus.correct} מתוך ${plus.total} בניסיון ראשון` : undefined} />
-                    <Tile label="הצלחה בחיסור" value={percent(minus)} sub={minus ? `${minus.correct} מתוך ${minus.total} בניסיון ראשון` : undefined} />
                     <Tile label="כוכבים ומדבקות" value={profile.stars} sub={`${profile.stickers} מדבקות נפתחו`} />
+                </section>
+
+                <section className="mb-6 rounded-2xl bg-white p-5 shadow-sm">
+                    <h2 className="mb-3 text-lg font-semibold">הצלחה בניסיון ראשון לפי נושא</h2>
+                    <div className="grid grid-cols-3 gap-3 md:grid-cols-6">
+                        {SKILLS.map(({ key, label }) => {
+                            const s = stats.bySkill[key];
+                            return (
+                                <div key={key} className="rounded-xl bg-slate-50 p-3">
+                                    <div className="text-sm text-slate-500">{label}</div>
+                                    <div className="text-2xl font-bold">{percent(s)}</div>
+                                    <div className="text-xs text-slate-500">{s ? `${s.correct} מתוך ${s.total}` : 'עוד לא תורגל'}</div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </section>
 
                 <section className="mb-6 rounded-2xl bg-white p-5 shadow-sm">
@@ -174,22 +209,31 @@ export default function Parent({ profile, stats, unlockMinutes }: Props) {
 
                     <section className="flex flex-col gap-5 rounded-2xl bg-white p-5 shadow-sm">
                         <div>
-                            <h2 className="mb-2 text-lg font-semibold">רמת קושי</h2>
+                            <h2 className="mb-2 text-lg font-semibold">פתיחת תחנות במסע</h2>
                             <p className="mb-3 text-sm text-slate-500">
-                                המשחק עולה לבד לרמת 20 אחרי 3 סבבים ברצף עם 8 תשובות נכונות ומעלה. אפשר גם לשנות ידנית.
+                                כל תחנה נפתחת אחרי כוכב אחד לפחות בתחנה שלפניה (6 תשובות נכונות מתוך 10). אפשר לפתוח ידנית עד תחנה מסוימת, למשל אם הוא כבר יודע את החומר.
                             </p>
-                            <div className="flex gap-2">
-                                {[10, 20].map((level) => (
-                                    <button
-                                        key={level}
-                                        type="button"
-                                        onClick={() => router.post('/parent/level', { level }, { preserveScroll: true })}
-                                        className={`rounded-xl px-5 py-2 font-semibold ${profile.level === level ? 'bg-sky-600 text-white' : 'bg-slate-100 hover:bg-slate-200'}`}
-                                        aria-pressed={profile.level === level}
-                                    >
-                                        עד {level}
-                                    </button>
-                                ))}
+                            <div className="flex flex-wrap items-center gap-2">
+                                <select
+                                    value={unlockTarget}
+                                    onChange={(e) => setUnlockTarget(Number(e.target.value))}
+                                    className="rounded-xl border border-slate-300 bg-white px-3 py-2"
+                                    aria-label="תחנה לפתיחה"
+                                >
+                                    {journey.stations.map((st) => (
+                                        <option key={st.id} value={st.id}>
+                                            {st.id}. {st.title} ({worlds[st.world].name})
+                                        </option>
+                                    ))}
+                                </select>
+                                <button
+                                    type="button"
+                                    onClick={() => router.post('/parent/unlock-to', { station: unlockTarget }, { preserveScroll: true })}
+                                    disabled={unlockTarget <= journey.current}
+                                    className="rounded-xl bg-sky-600 px-4 py-2 font-semibold text-white hover:bg-sky-700 disabled:bg-slate-300"
+                                >
+                                    לפתוח עד התחנה הזאת
+                                </button>
                             </div>
                         </div>
 

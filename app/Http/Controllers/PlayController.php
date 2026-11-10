@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Game\Curriculum;
 use App\Game\GameService;
-use App\Models\KidProfile;
 use App\Models\Round;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -14,14 +15,31 @@ class PlayController extends Controller
 {
     public function __construct(private GameService $game) {}
 
-    public function show(): Response
+    /** "Play" without a station continues the journey where the child left off. */
+    public function continue(): RedirectResponse
     {
-        $profile = KidProfile::current();
-        ['round' => $round, 'questions' => $questions] = $this->game->startRound($profile);
+        return redirect()->route('play', ['station' => $this->game->journey()['current']]);
+    }
+
+    public function show(int $station): Response|RedirectResponse
+    {
+        $definition = Curriculum::find($station);
+        if ($definition === null || ! $this->game->isUnlocked($station)) {
+            return redirect()->route('journey');
+        }
+
+        ['round' => $round, 'questions' => $questions] = $this->game->startRound($station);
 
         return Inertia::render('Play', [
             'roundId' => $round->id,
-            'level' => $round->level,
+            'station' => [
+                'id' => $definition['id'],
+                'title' => $definition['title'],
+                'world' => $definition['world'],
+                'boss' => $definition['boss'],
+                'visual' => $definition['visual'],
+            ],
+            'worlds' => Curriculum::WORLDS,
             'questions' => $questions,
         ]);
     }
@@ -32,7 +50,7 @@ class PlayController extends Controller
 
         $validated = $request->validate([
             'results' => ['required', 'array', 'size:'.$round->size],
-            'results.*.first_choice' => ['required', 'integer', 'min:0', 'max:40'],
+            'results.*.first_choice' => ['required', 'integer', 'min:0', 'max:100'],
             'results.*.mistakes' => ['required', 'integer', 'min:0', 'max:50'],
         ]);
 

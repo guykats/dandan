@@ -11,16 +11,9 @@ return [
     // Exercises per round.
     'round_size' => 10,
 
-    // Number of answer buttons shown per exercise.
+    // Number of answer buttons shown per numeric exercise.
     'choices' => 4,
 
-    // One sticker unlocks every N stars.
+    // One sticker unlocks every N stars (a star per first-try correct answer).
     'stars_per_sticker' => 20,
-
-    // Promotion from level 10 to level 20: this many consecutive rounds
-    // with at least `promotion_min_correct` first-try correct answers.
-    'promotion_rounds' => 3,
-    'promotion_min_correct' => 8,
-
-    'levels' => [10, 20],
 ];
