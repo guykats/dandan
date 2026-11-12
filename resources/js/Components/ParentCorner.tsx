@@ -39,6 +39,9 @@ export default function ParentCorner() {
             onPointerDown={start}
             onPointerUp={stop}
             onPointerLeave={stop}
+            onPointerCancel={stop}
+            onContextMenu={(e) => e.preventDefault()}
+            style={{ touchAction: 'none' }}
             className="relative flex h-11 w-11 items-center justify-center rounded-full bg-white/50 text-sky-800/60 hover:bg-white/80"
             aria-label="אזור הורים (לחיצה ארוכה)"
             title="אזור הורים — לחיצה ארוכה"

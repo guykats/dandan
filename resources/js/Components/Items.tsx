@@ -58,9 +58,9 @@ const shapes: Record<ItemProps['kind'], React.ReactNode> = {
 };
 
 /** A group of items laid out in rows of five, the way first graders count. */
-export function ItemGroup({ count, kind, size = 'h-11 w-11', crossedFrom = Infinity, offset = 0 }: { count: number; kind: ItemProps['kind']; size?: string; crossedFrom?: number; offset?: number }) {
+export function ItemGroup({ count, kind, size = 'h-7 w-7 sm:h-11 sm:w-11 short:h-6 short:w-6', crossedFrom = Infinity, offset = 0 }: { count: number; kind: ItemProps['kind']; size?: string; crossedFrom?: number; offset?: number }) {
     return (
-        <div className="grid grid-cols-5 gap-1" dir="ltr">
+        <div className="grid grid-cols-5 gap-0.5 sm:gap-1" dir="ltr">
             {Array.from({ length: count }, (_, i) => (
                 <Item key={i} kind={kind} className={size} crossed={i >= crossedFrom} delay={(i + offset) * 40} />
             ))}

@@ -13,11 +13,11 @@ interface Props {
  */
 export default function CountingObjects({ a, b, operation }: Props) {
     return (
-        <div className="flex min-h-28 items-center justify-center gap-6 rounded-3xl bg-white/70 px-6 py-4 shadow-inner" dir="ltr">
+        <div className="flex items-center justify-center gap-3 rounded-3xl bg-white/70 px-3 py-3 shadow-inner sm:min-h-28 sm:gap-6 sm:px-6 sm:py-4" dir="ltr">
             {operation === '+' ? (
                 <>
                     <ItemGroup count={a} kind="apple" />
-                    <span className="text-5xl font-bold text-sky-700">+</span>
+                    <span className="text-3xl font-bold text-sky-700 sm:text-5xl">+</span>
                     <ItemGroup count={b} kind="apple-green" offset={a} />
                 </>
             ) : (

@@ -34,7 +34,7 @@ export default function ParentGate() {
     const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-slate-100 px-6">
+        <div className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-slate-100 px-6">
             <Head title="אזור הורים" />
             <h1 className="text-3xl font-bold text-slate-800">אזור הורים</h1>
             <p className="text-lg text-slate-600">הקלידו את קוד ההורה</p>

@@ -67,7 +67,7 @@ export default function VoiceLab({ voices, defaultVoice, defaultMode, rates, def
             <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2} maxLength={160} className="rounded-xl border border-slate-300 p-3" aria-label="טקסט לבדיקה" />
             <label className="flex items-center gap-2">
                 <span className="text-sm font-medium">קול:</span>
-                <select value={voice} onChange={(e) => setVoice(e.target.value)} className="rounded-xl border border-slate-300 bg-white px-3 py-2" dir="ltr">
+                <select value={voice} onChange={(e) => setVoice(e.target.value)} className="min-w-0 flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 sm:flex-none" dir="ltr">
                     {voices.map((v) => (
                         <option key={v} value={v}>
                             {voiceLabel(v)}
@@ -78,7 +78,7 @@ export default function VoiceLab({ voices, defaultVoice, defaultMode, rates, def
             </label>
             <label className="flex items-center gap-2">
                 <span className="text-sm font-medium">מהירות:</span>
-                <select value={rate} onChange={(e) => setRate(Number(e.target.value))} className="rounded-xl border border-slate-300 bg-white px-3 py-2">
+                <select value={rate} onChange={(e) => setRate(Number(e.target.value))} className="min-w-0 flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 sm:flex-none">
                     {rates.map((r) => (
                         <option key={r} value={r}>
                             {r === 1 ? 'רגילה (1.0)' : `${r} (${Math.round((1 - r) * 100)}% לאט יותר)`}

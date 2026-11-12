@@ -9,6 +9,7 @@ import Star from '../Components/Star';
 import { StickerArt, STICKERS } from '../Components/StickerArt';
 import { postJson } from '../lib/http';
 import { playCorrect, playFanfare, playWrong } from '../lib/sfx';
+import { useCompact, useMedia } from '../lib/useMedia';
 import { PHRASES, phrases, prefetchSpeech, speak, stopSpeaking } from '../lib/speech';
 import type { Question, RoundSummary, StationInfo, World } from '../types';
 
@@ -36,6 +37,9 @@ export default function Play({ roundId, station, worlds, questions }: Props) {
     const [summary, setSummary] = useState<RoundSummary | null>(null);
     const [saveFailed, setSaveFailed] = useState(false);
     const firstChoice = useRef<number | null>(null);
+    const compact = useCompact();
+    // The eagle stands beside the exercise only on wide screens; elsewhere it sits above it.
+    const wide = useMedia('(min-width: 1024px)');
 
     const question = questions[index];
     const roundStars = results.filter((r, i) => r.first_choice === questions[i].answer).length;
@@ -112,53 +116,53 @@ export default function Play({ roundId, station, worlds, questions }: Props) {
     const isCompare = question.type === 'compare';
 
     return (
-        <div className="flex min-h-screen flex-col">
+        <div className="flex min-h-dvh flex-col">
             <Head title={station.title} />
 
-            <header className="flex items-center justify-between gap-4 px-6 pt-5">
-                <div className="flex items-center gap-3">
-                    <Link href="/journey" className="toy-btn flex h-14 w-14 items-center justify-center bg-white text-sky-700" aria-label="חזרה למפה" title="למפה">
-                        <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" aria-hidden>
+            <header className="flex flex-wrap items-center justify-between gap-2 px-3 pt-3 sm:gap-4 sm:px-6 sm:pt-5 lg:flex-nowrap short:pt-2">
+                <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+                    <Link href="/journey" className="toy-btn flex h-11 w-11 shrink-0 items-center justify-center bg-white text-sky-700 sm:h-14 sm:w-14" aria-label="חזרה למפה" title="למפה">
+                        <svg viewBox="0 0 24 24" className="h-6 w-6 sm:h-8 sm:w-8" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" aria-hidden>
                             <path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z" />
                             <path d="M9 4v14M15 6v14" />
                         </svg>
                     </Link>
-                    <div className="rounded-3xl bg-white/80 px-4 py-2 shadow">
-                        <div className="text-xs font-semibold text-sky-600">{worlds[station.world].name} · תחנה {station.id}</div>
-                        <div className="text-xl font-bold">{station.boss ? '🏆 ' : ''}{station.title}</div>
+                    <div className="min-w-0 rounded-3xl bg-white/80 px-3 py-1.5 shadow sm:px-4 sm:py-2">
+                        <div className="hidden text-xs font-semibold text-sky-600 sm:block">{worlds[station.world].name} · תחנה {station.id}</div>
+                        <div className="truncate text-base font-bold sm:text-xl">{station.boss ? '🏆 ' : ''}{station.title}</div>
                     </div>
                 </div>
 
-                <ol className="flex items-center gap-2" aria-label={`תרגיל ${index + 1} מתוך ${questions.length}`}>
+                <ol className="order-last flex w-full items-center justify-center gap-1 sm:gap-2 lg:order-none lg:w-auto" aria-label={`תרגיל ${index + 1} מתוך ${questions.length}`}>
                     {questions.map((_, i) => {
                         const done = i < results.length;
                         const star = done && results[i].first_choice === questions[i].answer;
                         return (
-                            <li key={i} className={`flex h-9 w-9 items-center justify-center rounded-full ${i === index ? 'bg-white ring-4 ring-amber-400' : 'bg-white/60'}`}>
-                                {done ? <Star size={26} filled={star} /> : <span className="text-sm font-bold text-sky-700">{i + 1}</span>}
+                            <li key={i} className={`flex h-7 w-7 items-center justify-center rounded-full sm:h-9 sm:w-9 ${i === index ? 'bg-white ring-4 ring-amber-400' : 'bg-white/60'}`}>
+                                {done ? <Star size={compact ? 20 : 26} filled={star} /> : <span className="text-xs font-bold text-sky-700 sm:text-sm">{i + 1}</span>}
                             </li>
                         );
                     })}
                 </ol>
 
-                <div className="flex items-center gap-3">
-                    <div className="flex h-14 items-center gap-2 rounded-3xl bg-white/80 px-4 text-2xl font-bold shadow">
-                        <Star size={30} />
+                <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                    <div className="flex h-11 items-center gap-1.5 rounded-3xl bg-white/80 px-3 text-xl font-bold shadow sm:h-14 sm:gap-2 sm:px-4 sm:text-2xl">
+                        <Star size={compact ? 24 : 30} />
                         <span>{roundStars}</span>
                     </div>
                     <SoundToggle />
                 </div>
             </header>
 
-            <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center gap-7 px-6 pb-10">
-                <div className="flex w-full items-center justify-center gap-8">
-                    <Eagle mood={mood} size={160} />
+            <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center gap-4 px-3 pt-3 pb-6 sm:gap-7 sm:px-6 sm:pb-10 short:gap-2 short:pt-1 short:pb-3">
+                <div className="flex w-full flex-col items-center justify-center gap-2 lg:flex-row lg:gap-8 short:flex-row short:gap-6">
+                    <Eagle mood={mood} size={compact ? 80 : wide ? 160 : 110} className="shrink-0" />
 
-                    <div className="flex flex-col items-center gap-5">
-                        <div key={index} className="flex items-center gap-5">
+                    <div className="flex flex-col items-center gap-5 short:gap-2">
+                        <div key={index} className="flex flex-col items-center gap-3 sm:flex-row sm:gap-5 short:gap-3">
                             <QuestionView question={question} solved={solved} />
-                            <button type="button" onClick={readQuestion} className="toy-btn flex h-16 w-16 shrink-0 items-center justify-center bg-sky-500 text-white" aria-label="להשמיע שוב" title="להשמיע שוב">
-                                <svg viewBox="0 0 24 24" className="h-9 w-9" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                            <button type="button" onClick={readQuestion} className="toy-btn flex h-12 w-12 shrink-0 items-center justify-center bg-sky-500 text-white sm:h-16 sm:w-16 short:h-11 short:w-11" aria-label="להשמיע שוב" title="להשמיע שוב">
+                                <svg viewBox="0 0 24 24" className="h-7 w-7 sm:h-9 sm:w-9" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                                     <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" />
                                     <path d="M16.5 8.5a5 5 0 0 1 0 7" />
                                 </svg>
@@ -169,7 +173,7 @@ export default function Play({ roundId, station, worlds, questions }: Props) {
                     </div>
                 </div>
 
-                <div className={`grid w-full gap-5 ${isCompare ? 'max-w-2xl grid-cols-3' : 'max-w-3xl grid-cols-4'}`} dir="ltr">
+                <div className={`grid w-full gap-3 sm:gap-5 ${isCompare ? 'max-w-2xl grid-cols-3' : 'max-w-3xl grid-cols-2 sm:grid-cols-4'}`} dir="ltr">
                     {question.choices.map((choice) => {
                         const wrong = wrongPicks.includes(choice);
                         const right = solved && choice === question.answer;
@@ -179,7 +183,7 @@ export default function Play({ roundId, station, worlds, questions }: Props) {
                                 type="button"
                                 disabled={wrong || solved}
                                 onClick={() => choose(choice)}
-                                className={`toy-btn h-32 text-7xl font-extrabold transition-colors ${
+                                className={`toy-btn h-20 text-5xl font-extrabold transition-colors sm:h-32 sm:text-7xl short:h-16 short:text-4xl ${
                                     right ? 'bg-emerald-400 text-white' : wrong ? 'bg-slate-200 text-slate-400 opacity-60' : 'bg-white text-sky-900 hover:bg-amber-50'
                                 } ${shaking === choice ? 'animate-shake' : ''}`}
                             >
@@ -222,6 +226,7 @@ function summarySpeech(data: RoundSummary, worlds: World[]): string {
 }
 
 function Summary({ summary, station, worlds }: { summary: RoundSummary; station: StationInfo; worlds: World[] }) {
+    const compact = useCompact();
     const newSticker = summary.stickers_after > summary.stickers_before && summary.stickers_after <= STICKERS.length;
     const stickerIndex = summary.stickers_after - 1;
     const unlockedWorld = summary.world_completed !== null ? worlds[summary.world_completed + 1] : undefined;
@@ -235,28 +240,28 @@ function Summary({ summary, station, worlds }: { summary: RoundSummary; station:
             : 'כל הכבוד!';
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center gap-7 px-6 py-10">
+        <div className="flex min-h-dvh flex-col items-center justify-center gap-4 px-4 py-6 sm:gap-7 sm:px-6 sm:py-10">
             <Head title={title} />
             {summary.passed && <Confetti pieces={summary.world_completed !== null ? 120 : 60} />}
 
-            <div className="flex items-center gap-8">
-                <Eagle mood={summary.passed ? 'cheer' : 'encourage'} size={210} />
-                <div className="flex flex-col items-center gap-4 rounded-[2rem] bg-white px-10 py-8 shadow-xl">
-                    <div className="text-lg font-semibold text-sky-600">תחנה {station.id} · {station.title}</div>
-                    <h1 className="text-5xl font-extrabold">{title}</h1>
+            <div className="flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row sm:gap-8">
+                <Eagle mood={summary.passed ? 'cheer' : 'encourage'} size={compact ? 120 : 210} />
+                <div className="flex w-full max-w-sm flex-col items-center gap-3 rounded-[2rem] bg-white px-5 py-5 text-center shadow-xl sm:w-auto sm:max-w-none sm:gap-4 sm:px-10 sm:py-8">
+                    <div className="text-base font-semibold text-sky-600 sm:text-lg">תחנה {station.id} · {station.title}</div>
+                    <h1 className="text-4xl font-extrabold sm:text-5xl">{title}</h1>
 
                     <div className="flex items-end gap-2" aria-label={`${summary.rating} כוכבים מתוך 3`}>
                         {[0, 1, 2].map((i) => (
                             <span key={i} className="animate-pop" style={{ animationDelay: `${300 + i * 250}ms` }}>
-                                <Star size={i === 1 ? 92 : 72} filled={i < summary.rating} />
+                                <Star size={(i === 1 ? 92 : 72) * (compact ? 0.7 : 1)} filled={i < summary.rating} />
                             </span>
                         ))}
                     </div>
 
-                    <p className="text-2xl font-semibold">
+                    <p className="text-xl font-semibold sm:text-2xl">
                         {summary.correct} מתוך 10 נכון בניסיון הראשון
                     </p>
-                    {!summary.passed && <p className="text-xl text-sky-700">צריך 6 תשובות נכונות כדי לעבור לתחנה הבאה</p>}
+                    {!summary.passed && <p className="text-lg text-sky-700 sm:text-xl">צריך 6 תשובות נכונות כדי לעבור לתחנה הבאה</p>}
                     {summary.passed && summary.best_rating > summary.rating && (
                         <p className="text-lg text-sky-600">השיא שלך בתחנה הזאת: {summary.best_rating} כוכבים</p>
                     )}
@@ -264,15 +269,15 @@ function Summary({ summary, station, worlds }: { summary: RoundSummary; station:
             </div>
 
             {unlockedWorld && (
-                <div className="animate-pop rounded-3xl bg-gradient-to-br from-amber-300 to-rose-300 px-10 py-5 text-center shadow-lg" style={{ animationDelay: '900ms' }}>
+                <div className="animate-pop rounded-3xl bg-gradient-to-br from-amber-300 to-rose-300 px-6 py-4 text-center shadow-lg sm:px-10 sm:py-5" style={{ animationDelay: '900ms' }}>
                     <p className="text-2xl font-bold">🎉 נפתח עולם חדש!</p>
-                    <p className="text-4xl font-extrabold">{unlockedWorld.name}</p>
+                    <p className="text-3xl font-extrabold sm:text-4xl">{unlockedWorld.name}</p>
                 </div>
             )}
 
             {newSticker && (
-                <div className="animate-pop flex items-center gap-5 rounded-3xl bg-gradient-to-br from-amber-200 to-pink-200 px-8 py-5 shadow-lg" style={{ animationDelay: '1100ms' }}>
-                    <div className="h-28 w-28 rounded-2xl bg-white p-2">
+                <div className="animate-pop flex items-center gap-4 rounded-3xl bg-gradient-to-br from-amber-200 to-pink-200 px-5 py-4 shadow-lg sm:gap-5 sm:px-8 sm:py-5" style={{ animationDelay: '1100ms' }}>
+                    <div className="h-20 w-20 rounded-2xl bg-white p-2 sm:h-28 sm:w-28">
                         <StickerArt index={stickerIndex} />
                     </div>
                     <div>
@@ -282,20 +287,20 @@ function Summary({ summary, station, worlds }: { summary: RoundSummary; station:
                 </div>
             )}
 
-            <div className="flex flex-wrap justify-center gap-5">
+            <div className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:justify-center sm:gap-5">
                 {summary.next_station && (
-                    <button type="button" onClick={() => router.visit(`/play/${summary.next_station}`)} className="toy-btn bg-amber-400 px-12 py-5 text-4xl font-extrabold text-sky-950">
+                    <button type="button" onClick={() => router.visit(`/play/${summary.next_station}`)} className="toy-btn bg-amber-400 px-6 py-4 text-3xl font-extrabold text-sky-950 sm:px-12 sm:py-5 sm:text-4xl">
                         לתחנה הבאה ▶
                     </button>
                 )}
                 <button
                     type="button"
                     onClick={() => router.visit(`/play/${station.id}`)}
-                    className={`toy-btn px-8 py-5 text-3xl font-bold ${summary.passed ? 'bg-white text-sky-800' : 'bg-amber-400 text-sky-950'}`}
+                    className={`toy-btn px-6 py-3 text-2xl font-bold sm:px-8 sm:py-5 sm:text-3xl ${summary.passed ? 'bg-white text-sky-800' : 'bg-amber-400 text-sky-950'}`}
                 >
                     🔁 {summary.passed ? 'לשפר את התוצאה' : 'לנסות שוב'}
                 </button>
-                <Link href="/journey" className="toy-btn bg-white px-8 py-5 text-3xl font-bold text-sky-800">🗺️ למפה</Link>
+                <Link href="/journey" className="toy-btn bg-white px-6 py-3 text-center text-2xl font-bold text-sky-800 sm:px-8 sm:py-5 sm:text-3xl">🗺️ למפה</Link>
             </div>
         </div>
     );

@@ -48,7 +48,7 @@ function Tile({ label, value, sub }: { label: string; value: string | number; su
     return (
         <div className="rounded-2xl bg-white p-5 shadow-sm">
             <div className="text-sm font-medium text-slate-500">{label}</div>
-            <div className="mt-1 text-4xl font-bold text-slate-900">{value}</div>
+            <div className="mt-1 text-3xl font-bold text-slate-900 sm:text-4xl">{value}</div>
             {sub && <div className="mt-1 text-sm text-slate-500">{sub}</div>}
         </div>
     );
@@ -74,6 +74,7 @@ function RecentRoundsChart({ rounds }: { rounds: RecentRound[] }) {
                         className="relative flex h-full w-full max-w-12 flex-1 items-end"
                         onMouseEnter={() => setHover(i)}
                         onMouseLeave={() => setHover(null)}
+                        onClick={() => setHover(hover === i ? null : i)}
                     >
                         <div
                             className={`w-full rounded-t ${hover === i ? 'bg-sky-700' : 'bg-sky-500'}`}
@@ -152,11 +153,11 @@ export default function Parent({ profile, journey, worlds, stats, unlockMinutes,
     const [unlockTarget, setUnlockTarget] = useState(journey.current);
 
     return (
-        <div className="min-h-screen bg-slate-100 text-slate-900 select-text">
+        <div className="min-h-dvh bg-slate-100 text-slate-900 select-text">
             <Head title="אזור הורים" />
-            <div className="mx-auto max-w-5xl px-6 py-8">
-                <header className="mb-6 flex items-center justify-between">
-                    <h1 className="text-3xl font-bold">אזור הורים</h1>
+            <div className="mx-auto max-w-5xl px-4 py-5 sm:px-6 sm:py-8">
+                <header className="mb-4 flex flex-wrap items-center justify-between gap-3 sm:mb-6">
+                    <h1 className="text-2xl font-bold sm:text-3xl">אזור הורים</h1>
                     <div className="flex items-center gap-3">
                         <Link href="/" className="rounded-xl bg-white px-4 py-2 font-semibold shadow-sm hover:bg-slate-50">חזרה למשחק</Link>
                         <button type="button" onClick={() => router.post('/parent/lock')} className="rounded-xl bg-slate-800 px-4 py-2 font-semibold text-white hover:bg-slate-700">
@@ -191,7 +192,7 @@ export default function Parent({ profile, journey, worlds, stats, unlockMinutes,
 
                 <section className="mb-6 rounded-2xl bg-white p-5 shadow-sm">
                     <h2 className="mb-1 text-lg font-semibold">תשובות נכונות בניסיון ראשון — 15 הסבבים האחרונים</h2>
-                    <p className="mb-4 text-sm text-slate-500">מעבר עם העכבר על עמודה מציג פרטים.</p>
+                    <p className="mb-4 text-sm text-slate-500">מעבר עם העכבר או נגיעה בעמודה מציגים פרטים.</p>
                     <RecentRoundsChart rounds={stats.recentRounds} />
                 </section>
 
@@ -232,7 +233,7 @@ export default function Parent({ profile, journey, worlds, stats, unlockMinutes,
                                 <select
                                     value={unlockTarget}
                                     onChange={(e) => setUnlockTarget(Number(e.target.value))}
-                                    className="rounded-xl border border-slate-300 bg-white px-3 py-2"
+                                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 sm:w-auto"
                                     aria-label="תחנה לפתיחה"
                                 >
                                     {journey.stations.map((st) => (

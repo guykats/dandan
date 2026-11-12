@@ -10,23 +10,24 @@ export default function Stickers({ unlocked }: { unlocked: number }) {
     const remaining = starsPerSticker - (kid.stars % starsPerSticker);
 
     return (
-        <div className="flex min-h-screen flex-col">
+        <div className="flex min-h-dvh flex-col">
             <Head title="האוסף שלי" />
             <TopBar back>
-                <h1 className="text-4xl font-extrabold">האוסף שלי</h1>
+                <h1 className="hidden text-2xl font-extrabold sm:block sm:text-4xl">האוסף שלי</h1>
             </TopBar>
 
-            <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-6 py-8">
+            <main className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-3 py-5 sm:gap-6 sm:px-6 sm:py-8">
+                <h1 className="text-center text-2xl font-extrabold sm:hidden">האוסף שלי</h1>
                 {unlocked < STICKERS.length && (
-                    <p className="flex items-center justify-center gap-2 text-2xl font-semibold">
+                    <p className="flex items-center justify-center gap-2 text-xl font-semibold sm:text-2xl">
                         עוד {remaining} <Star size={28} /> למדבקה הבאה!
                     </p>
                 )}
 
                 {WORLDS.map((world) => (
-                    <section key={world.id} className={`rounded-3xl bg-gradient-to-br ${world.bg} p-5 shadow-lg`}>
-                        <h2 className="mb-4 text-3xl font-bold text-white drop-shadow">{world.name}</h2>
-                        <div className="grid grid-cols-4 gap-4">
+                    <section key={world.id} className={`rounded-3xl bg-gradient-to-br ${world.bg} p-3 shadow-lg sm:p-5`}>
+                        <h2 className="mb-3 text-2xl font-bold text-white drop-shadow sm:mb-4 sm:text-3xl">{world.name}</h2>
+                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
                             {STICKERS.map((sticker, index) => {
                                 if (sticker.world !== world.id) return null;
                                 const isUnlocked = index < unlocked;
@@ -43,7 +44,7 @@ export default function Stickers({ unlocked }: { unlocked: number }) {
                                         <div className="h-full w-full">
                                             <StickerArt index={index} locked={!isUnlocked} />
                                         </div>
-                                        {isUnlocked && <span className="text-xl font-bold">{sticker.name}</span>}
+                                        {isUnlocked && <span className="text-base font-bold sm:text-xl">{sticker.name}</span>}
                                     </button>
                                 );
                             })}

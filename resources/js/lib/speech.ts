@@ -7,7 +7,33 @@ let cachedVoice: SpeechSynthesisVoice | null | undefined;
 
 // Server-side voice (Azure). When set, speech is played from /tts audio files.
 let serverVoice: string | null = null;
-let currentAudio: HTMLAudioElement | null = null;
+let player: HTMLAudioElement | null = null;
+let playToken = 0;
+
+// A tiny silent MP3, played once inside the first tap to unlock audio on iOS / Android.
+const SILENT_MP3 = '/silence.mp3';
+
+function sharedPlayer(): HTMLAudioElement | null {
+    if (typeof window === 'undefined' || typeof Audio === 'undefined') return null;
+    player ??= new Audio();
+    return player;
+}
+
+/** Call once from app start: the first tap unlocks the shared audio element. */
+export function installAudioUnlock(): void {
+    if (typeof window === 'undefined') return;
+    const unlock = () => {
+        const p = sharedPlayer();
+        if (p && !p.src) {
+            p.src = SILENT_MP3;
+            p.play().catch(() => {});
+        }
+        // Also wake the browser speech engine on iOS.
+        if ('speechSynthesis' in window) window.speechSynthesis.getVoices();
+        window.removeEventListener('pointerdown', unlock, true);
+    };
+    window.addEventListener('pointerdown', unlock, true);
+}
 
 export function configureServerVoice(voice: string | null | undefined): void {
     serverVoice = voice ?? null;
@@ -81,18 +107,23 @@ export function speak(text: string, options: { force?: boolean } = {}): void {
         return;
     }
 
-    const audio = new Audio(ttsUrl(text));
-    currentAudio = audio;
+    const audio = sharedPlayer();
+    if (!audio) {
+        speakWithBrowser(text);
+        return;
+    }
 
-    // If the server can't produce audio (not configured, quota, network), fall back to the browser voice.
-    audio.addEventListener('error', () => {
-        if (currentAudio === audio) speakWithBrowser(text);
-    });
-
+    // Reusing one element keeps playback allowed on phones after the first tap.
+    const token = ++playToken;
+    audio.onerror = () => {
+        // The server couldn't produce audio (not configured, quota, network): use the browser voice.
+        if (token === playToken) speakWithBrowser(text);
+    };
+    audio.src = ttsUrl(text);
     audio.play().catch((error: unknown) => {
-        // Autoplay blocked before the first click: nothing to do, the next click will work.
+        // Autoplay blocked before the first tap: nothing to do, the next tap will work.
         if (error instanceof DOMException && error.name === 'NotAllowedError') return;
-        if (currentAudio === audio) speakWithBrowser(text);
+        if (token === playToken && !(error instanceof DOMException && error.name === 'AbortError')) speakWithBrowser(text);
     });
 }
 
@@ -105,10 +136,8 @@ export function prefetchSpeech(texts: string[]): void {
 }
 
 export function stopSpeaking(): void {
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
-    }
+    playToken++;
+    if (player && !player.paused) player.pause();
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel();
 }
 

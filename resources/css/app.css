@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "@fontsource-variable/rubik";
 
+/* Phones held sideways: very little height, so everything shrinks. */
+@custom-variant short (@media (max-height: 500px));
+
 @theme {
   --font-sans: "Rubik Variable", system-ui, "Segoe UI", Arial, sans-serif;
   --color-sky-deep: #0c4a6e;
@@ -15,9 +18,18 @@ body,
   min-height: 100%;
 }
 
+/* No long-press callout or image drag on touch screens. */
+svg,
+img {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+}
+
 html {
   min-height: 100%;
-  background: linear-gradient(180deg, #bae6fd 0%, #e0f2fe 55%, #fef3c7 100%);
+  /* The gradient covers the first screen; longer pages continue in its last color. */
+  background: linear-gradient(180deg, #bae6fd 0%, #e0f2fe 55%, #fef3c7 100%) no-repeat, #fef3c7;
+  background-size: 100% 100vh;
 }
 
 body {
@@ -25,6 +37,13 @@ body {
   font-family: var(--font-sans);
   color: var(--color-sky-deep);
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  /* No double-tap zoom delay on phones. */
+  touch-action: manipulation;
+  /* Keep content clear of the iPhone notch and home bar. */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 * {
@@ -44,10 +63,12 @@ button {
     box-shadow: 0 6px 0 rgba(12, 74, 110, 0.25);
     transition: transform 80ms ease, box-shadow 80ms ease, filter 120ms ease;
   }
-  .toy-btn:hover:not(:disabled) {
-    filter: brightness(1.05);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 0 rgba(12, 74, 110, 0.25);
+  @media (hover: hover) {
+    .toy-btn:hover:not(:disabled) {
+      filter: brightness(1.05);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 rgba(12, 74, 110, 0.25);
+    }
   }
   .toy-btn:active:not(:disabled) {
     transform: translateY(4px);
