@@ -6,6 +6,7 @@ export interface VoiceLabProps {
     defaultMode: string;
     rates: number[];
     defaultRate: number;
+    defaultVocalize: boolean;
 }
 
 const MODES: { id: string; label: string; example: string }[] = [
@@ -19,12 +20,13 @@ function voiceLabel(voice: string): string {
 }
 
 /** Lets the parent compare voices and number-reading modes before choosing the .env settings. */
-export default function VoiceLab({ voices, defaultVoice, defaultMode, rates, defaultRate }: VoiceLabProps) {
-    const [text, setText] = useState('כמה זה 7 ועוד 5? 13 פחות 8 זה 5. השלמה ל-10.');
+export default function VoiceLab({ voices, defaultVoice, defaultMode, rates, defaultRate, defaultVocalize }: VoiceLabProps) {
+    const [text, setText] = useState('כמה זה 7 ועוד 5? כמעט! עוד פעם. ספירה עד 10. כל הכבוד!');
     const [voice, setVoice] = useState(defaultVoice);
     const [status, setStatus] = useState<string | null>(null);
     const [mode, setMode] = useState(defaultMode);
     const [rate, setRate] = useState(defaultRate);
+    const [vocalize, setVocalize] = useState(defaultVocalize);
     const [copied, setCopied] = useState(false);
     const audio = useRef<HTMLAudioElement | null>(null);
 
@@ -32,7 +34,7 @@ export default function VoiceLab({ voices, defaultVoice, defaultMode, rates, def
         setMode(selectedMode);
         setCopied(false);
         audio.current?.pause();
-        const url = `/tts?t=${encodeURIComponent(text.trim())}&m=${selectedMode}&v=${encodeURIComponent(voice)}&r=${rate}`;
+        const url = `/tts?t=${encodeURIComponent(text.trim())}&m=${selectedMode}&v=${encodeURIComponent(voice)}&r=${rate}&w=${vocalize ? 1 : 0}`;
         const a = new Audio(url);
         audio.current = a;
         setStatus('טוען…');
@@ -41,7 +43,7 @@ export default function VoiceLab({ voices, defaultVoice, defaultMode, rates, def
         a.play().catch(() => {});
     };
 
-    const envLines = `${voice.endsWith('Neural') ? 'AZURE_SPEECH_VOICE' : 'GOOGLE_TTS_VOICE'}=${voice}\nTTS_NUMBERS=${mode}\nTTS_RATE=${rate}`;
+    const envLines = `${voice.endsWith('Neural') ? 'AZURE_SPEECH_VOICE' : 'GOOGLE_TTS_VOICE'}=${voice}\nTTS_NUMBERS=${mode}\nTTS_RATE=${rate}\nTTS_VOCALIZE=${vocalize ? 'true' : 'false'}`;
 
     const copy = async () => {
         try {
@@ -86,6 +88,10 @@ export default function VoiceLab({ voices, defaultVoice, defaultMode, rates, def
                         </option>
                     ))}
                 </select>
+            </label>
+            <label className="flex items-center gap-2">
+                <input type="checkbox" checked={vocalize} onChange={(e) => setVocalize(e.target.checked)} className="h-5 w-5" />
+                <span className="text-sm font-medium">ניקוד למילים (למשל "סְפִירָה", "נָכוֹן"){defaultVocalize ? ' · נוכחי: פעיל' : ' · נוכחי: כבוי'}</span>
             </label>
             <div className="flex flex-wrap gap-2">
                 {MODES.map((m) => (

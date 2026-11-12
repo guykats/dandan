@@ -292,7 +292,7 @@ class QuestionFactory
             'skill' => 'compare',
             'label' => "{$leftLabel} ? {$right}",
             'speech' => $mode === 'objects'
-                ? 'באיזה צד יש יותר? בחרו את הסימן הנכון'
+                ? 'באיזה צד יש יותר? בחר את הסימן הנכון'
                 : "איזה סימן מתאים בין {$speechLeft} לבין {$right}?",
             'answer' => $answer,
             'choices' => [self::COMPARE_LESS, self::COMPARE_EQUAL, self::COMPARE_GREATER],

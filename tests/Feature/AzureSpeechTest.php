@@ -36,7 +36,7 @@ class AzureSpeechTest extends TestCase
         Http::assertSent(fn ($request) => $request->hasHeader('Ocp-Apim-Subscription-Key', 'test-key')
             && str_contains($request->body(), 'he-IL-HilaNeural')
             && str_contains($request->body(), 'rate="+0%"')
-            && str_contains($request->body(), 'כמה זה שלוש ועוד ארבע?'));
+            && str_contains($request->body(), 'כַּמָּה זֶה שלוש וְעוֹד ארבע?'));
     }
 
     public function test_escapes_text_inside_ssml(): void

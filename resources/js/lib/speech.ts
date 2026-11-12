@@ -193,7 +193,8 @@ function pick<T>(items: T[]): T {
 
 export const PHRASES = {
     correct: ['כל הכבוד!', 'מעולה!', 'יפה מאוד!', 'נכון!', 'אלוף!', 'וואו, נכון!'],
-    tryAgain: ['כמעט! נסה שוב', 'לא נורא, נסה עוד פעם', 'בוא נספור יחד ונסה שוב'],
+    // Plain words only: the server adds vowel marks before speaking (see HebrewLexicon).
+    tryAgain: ['כמעט! עוד פעם', 'לא נורא, עוד ניסיון', 'בוא נספור יחד'],
 };
 
 export const phrases = {

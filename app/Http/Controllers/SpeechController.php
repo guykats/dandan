@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Speech\HebrewLexicon;
 use App\Speech\HebrewNumbers;
 use App\Speech\Speech;
 use Illuminate\Http\Request;
@@ -27,6 +28,7 @@ class SpeechController extends Controller
         // Optional overrides used by the voice lab in the parent area.
         $mode = (string) $request->query('m', config('dandan.tts.numbers'));
         $voice = (string) $request->query('v', $tts->voice());
+        $vocalize = (bool) (int) $request->query('w', config('dandan.tts.vocalize') ? '1' : '0');
         $rate = (float) $request->query('r', config('dandan.tts.rate'));
         $allowedRates = array_map('floatval', [...config('dandan.tts.rates'), config('dandan.tts.rate')]);
         abort_unless(
@@ -36,7 +38,7 @@ class SpeechController extends Controller
             422,
         );
 
-        $path = "tts/{$voice}/{$mode}/r".number_format($rate, 2).'/'.sha1($text).'.mp3';
+        $path = "tts/{$voice}/{$mode}".($vocalize ? '-w' : '').'/r'.number_format($rate, 2).'/'.sha1($text).'.mp3';
         $disk = Storage::disk('local');
 
         if (! $disk->exists($path)) {
@@ -51,7 +53,7 @@ class SpeechController extends Controller
             }
 
             try {
-                $disk->put($path, $tts->synthesize(HebrewNumbers::spell($text, $mode), $voice, $rate));
+                $disk->put($path, $tts->synthesize($this->prepare($text, $mode, $vocalize), $voice, $rate));
             } catch (Throwable $e) {
                 Log::warning('TTS synthesis failed', ['voice' => $voice, 'error' => $e->getMessage()]);
                 Cache::put($downKey, true, now()->addMinutes(5));
@@ -63,5 +65,15 @@ class SpeechController extends Controller
             'Content-Type' => 'audio/mpeg',
             'Cache-Control' => 'public, max-age=31536000, immutable',
         ]);
+    }
+
+    /** Text as sent to the engine: vowel marks on known words, numbers spelled out per mode. */
+    private function prepare(string $text, string $mode, bool $vocalize): string
+    {
+        if ($vocalize) {
+            $text = HebrewLexicon::vocalize($text);
+        }
+
+        return HebrewNumbers::spell($text, $mode);
     }
 }

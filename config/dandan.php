@@ -42,6 +42,9 @@ return [
         // Speeds offered in the parent voice lab.
         'rates' => [1.0, 0.9, 0.8, 0.7, 0.6],
 
+        // Add vowel marks (nikud) to known game words before speaking, to avoid wrong readings.
+        'vocalize' => (bool) env('TTS_VOCALIZE', true),
+
         // How numbers are sent to the engine: digits, words (no vowel marks) or nikud (with vowel marks).
         'numbers' => env('TTS_NUMBERS', 'words'),
 

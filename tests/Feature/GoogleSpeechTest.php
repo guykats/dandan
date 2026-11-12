@@ -37,7 +37,7 @@ class GoogleSpeechTest extends TestCase
         Http::assertSent(fn ($request) => $request->hasHeader('X-Goog-Api-Key', 'g-key')
             && $request['voice']['languageCode'] === 'he-IL'
             && $request['voice']['name'] === 'he-IL-Chirp3-HD-Aoede'
-            && $request['input']['text'] === 'כמה זה שלוש ועוד ארבע?'
+            && $request['input']['text'] === 'כַּמָּה זֶה שלוש וְעוֹד ארבע?'
             && $request['audioConfig']['audioEncoding'] === 'MP3'
             && $request['audioConfig']['speakingRate'] === 1.0);
     }
@@ -70,8 +70,8 @@ class GoogleSpeechTest extends TestCase
         $this->get('/tts?t='.urlencode('כמה זה 7?').'&m=digits&v=he-IL-Wavenet-B')->assertOk();
         $this->get('/tts?t='.urlencode('כמה זה 7?').'&m=nikud')->assertOk();
 
-        Http::assertSent(fn ($r) => $r['voice']['name'] === 'he-IL-Wavenet-B' && $r['input']['text'] === 'כמה זה 7?');
-        Http::assertSent(fn ($r) => $r['voice']['name'] === 'he-IL-Chirp3-HD-Aoede' && $r['input']['text'] === 'כמה זה שֶׁבַע?');
+        Http::assertSent(fn ($r) => $r['voice']['name'] === 'he-IL-Wavenet-B' && $r['input']['text'] === 'כַּמָּה זֶה 7?');
+        Http::assertSent(fn ($r) => $r['voice']['name'] === 'he-IL-Chirp3-HD-Aoede' && $r['input']['text'] === 'כַּמָּה זֶה שֶׁבַע?');
     }
 
     public function test_rejects_unknown_voice_or_mode(): void
@@ -115,5 +115,17 @@ class GoogleSpeechTest extends TestCase
         $this->get('/tts?t='.urlencode('שלום').'&r=3')->assertStatus(422);
         $this->get('/tts?t='.urlencode('שלום').'&r=0.1')->assertStatus(422);
         Http::assertNothingSent();
+    }
+
+    public function test_vocalizing_can_be_switched_off_per_request(): void
+    {
+        Http::fake(['*' => Http::response(['audioContent' => base64_encode('MP3DATA')])]);
+
+        $this->get('/tts?t='.urlencode('כמעט! עוד פעם').'&w=0')->assertOk();
+        $this->get('/tts?t='.urlencode('כמעט! עוד פעם'))->assertOk();
+
+        Http::assertSentCount(2);
+        Http::assertSent(fn ($r) => $r['input']['text'] === 'כמעט! עוד פעם');
+        Http::assertSent(fn ($r) => $r['input']['text'] === 'כִּמְעַט! עוֹד פַּעַם');
     }
 }

@@ -46,7 +46,7 @@ function StepHint({ step }: { step: number }) {
 
 export function hintSpeech(hint: Hint): string | null {
     if (hint.kind === 'step') {
-        return `שימו לב: כל פעם ${hint.step > 0 ? 'מוסיפים' : 'מורידים'} ${Math.abs(hint.step)}`;
+        return `שים לב: כל פעם ${hint.step > 0 ? 'מוסיפים' : 'מורידים'} ${Math.abs(hint.step)}`;
     }
     return null;
 }

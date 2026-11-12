@@ -102,6 +102,7 @@ class ParentController extends Controller
                 'defaultMode' => config('dandan.tts.numbers'),
                 'rates' => config('dandan.tts.rates'),
                 'defaultRate' => (float) config('dandan.tts.rate'),
+                'defaultVocalize' => (bool) config('dandan.tts.vocalize'),
             ] : null,
         ]);
     }
