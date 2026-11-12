@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
-class SpeechTest extends TestCase
+class AzureSpeechTest extends TestCase
 {
     use RefreshDatabase;
 

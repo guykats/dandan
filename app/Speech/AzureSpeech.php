@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
 /** Synthesizes speech with the Azure AI Speech REST API. */
-class AzureSpeech
+class AzureSpeech implements SpeechSynthesizer
 {
     public function __construct(
         private string $key,
@@ -20,7 +20,7 @@ class AzureSpeech
     {
         $config = config('dandan.tts.azure');
 
-        if (config('dandan.tts.driver') !== 'azure' || empty($config['key']) || empty($config['region'])) {
+        if (empty($config['key']) || empty($config['region'])) {
             return null;
         }
 

@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\KidProfile;
-use App\Speech\AzureSpeech;
+use App\Speech\Speech;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -26,7 +26,7 @@ class HandleInertiaRequests extends Middleware
             'kid' => fn () => $this->kid(),
             'starsPerSticker' => (int) config('dandan.stars_per_sticker'),
             // Name of the server voice when server-side speech is configured, otherwise null.
-            'serverVoice' => AzureSpeech::fromConfig()?->voice(),
+            'serverVoice' => Speech::fromConfig()?->voice(),
         ];
     }
 

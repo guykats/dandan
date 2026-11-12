@@ -108,7 +108,7 @@ function VoiceCheck() {
     if (server) {
         return (
             <div className="flex flex-wrap items-center gap-4">
-                <p className="text-emerald-700">✓ הקראה מהשרת (Azure), קול: {server.replace('he-IL-', '').replace('Neural', '')}</p>
+                <p className="text-emerald-700">✓ הקראה מהשרת ({server.includes('Neural') ? 'Azure' : 'Google'}), קול: {server.replace('he-IL-', '').replace('Neural', '').replace('Chirp3-HD-', '')}</p>
                 <button type="button" onClick={() => speak('כמה זה שלוש ועוד ארבע?', { force: true })} className="rounded-xl bg-sky-600 px-4 py-2 font-semibold text-white hover:bg-sky-700">
                     בדיקת קול
                 </button>

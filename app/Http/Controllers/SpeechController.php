@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Speech\AzureSpeech;
+use App\Speech\Speech;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
@@ -14,7 +14,7 @@ class SpeechController extends Controller
 {
     public function show(Request $request): Response
     {
-        $tts = AzureSpeech::fromConfig();
+        $tts = Speech::fromConfig();
         abort_if($tts === null, 404);
 
         $text = trim((string) $request->query('t', ''));

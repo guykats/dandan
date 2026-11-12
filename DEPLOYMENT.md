@@ -79,26 +79,32 @@ ln -s app/public public_html
 לפתוח את https://dandan.guykats.com. אמור להופיע דנדן הנשר.
 אם משהו לא עובד: `~/domains/dandan.guykats.com/app/storage/logs/laravel.log`.
 
-## הקראה בעברית (Azure)
+## הקראה בעברית (Google Cloud)
 
-השרת מייצר את הקול בעזרת Azure AI Speech ושומר כל משפט ב-`storage/app/private/tts`, כך שכל משפט נשלח ל-Azure פעם אחת בלבד.
-בלי הגדרה, או אם Azure לא זמין, האפליקציה חוזרת לקול של הדפדפן.
+השרת מייצר את הקול בעזרת Google Cloud Text-to-Speech ושומר כל משפט ב-`storage/app/private/tts`, כך שכל משפט נשלח ל-Google פעם אחת בלבד.
+בלי הגדרה, או אם Google לא זמין, האפליקציה חוזרת לקול של הדפדפן.
 
-1. ב-[Azure Portal](https://portal.azure.com) → **Create a resource** → מחפשים **Speech** → **Create**.
-2. ממלאים: Resource group חדש (למשל `dandan`), Region: **West Europe**, שם כלשהו, ו-Pricing tier: **Free F0**.
-3. **Review + create** → **Create**. בסיום: **Go to resource** → **Keys and Endpoint**.
-4. מעתיקים את **KEY 1** ואת **Location/Region** (למשל `westeurope`) ל-`.env` בשרת:
+1. ב-[Google Cloud Console](https://console.cloud.google.com) יוצרים פרויקט חדש (למשל `dandan`).
+2. **Billing**: מחברים חשבון חיוב לפרויקט. Google דורשת את זה גם כשהשימוש בתוך המכסה החינמית.
+3. **APIs & Services → Library** → מחפשים **Cloud Text-to-Speech API** → **Enable**.
+4. **APIs & Services → Credentials → Create credentials → API key**. אחר כך **Edit API key**:
+   - **API restrictions** → Restrict key → לסמן רק **Cloud Text-to-Speech API**.
+5. **Billing → Budgets & alerts** → תקציב של 1$ עם התראה במייל. זו רשת ביטחון: התקציב מתריע ולא חוסם.
+6. ב-`.env` בשרת:
 
 ```
-TTS_DRIVER=azure
-AZURE_SPEECH_KEY=...           # KEY 1
-AZURE_SPEECH_REGION=westeurope
-AZURE_SPEECH_VOICE=he-IL-HilaNeural   # or he-IL-AvriNeural for a male voice
+TTS_DRIVER=google
+GOOGLE_TTS_KEY=...                       # the API key
+GOOGLE_TTS_VOICE=he-IL-Chirp3-HD-Aoede   # see voices below
 ```
 
-5. `php artisan config:cache`, ואז באזור ההורים אמור להופיע "הקראה מהשרת (Azure)". לוחצים "בדיקת קול".
+7. `php artisan config:cache`, ואז באזור ההורים אמור להופיע "הקראה מהשרת (Google)". לוחצים "בדיקת קול".
 
-בשכבה F0 אין חיוב: כשמגיעים למכסה החודשית השירות פשוט מפסיק לענות, והאפליקציה עוברת לקול של הדפדפן עד החודש הבא.
+**החלפת קול:** הקולות של Chirp 3 HD נקראים `he-IL-Chirp3-HD-<שם>`, למשל Aoede, Kore או Leda (נשיים), Puck או Charon (גבריים).
+את הרשימה המלאה אפשר לשמוע בדף ההדגמה של Google. אחרי שינוי מריצים שוב `php artisan config:cache`.
+אם קול כלשהו מחזיר שגיאה, אפשר לנסות `GOOGLE_TTS_RATE=1`, או קול ותיק יותר כמו `he-IL-Wavenet-A`.
+
+**חלופה: Azure.** מגדירים `TTS_DRIVER=azure` עם `AZURE_SPEECH_KEY` ו-`AZURE_SPEECH_REGION` (משאב Speech בשכבה Free F0).
 
 ## פריסות אוטומטיות
 

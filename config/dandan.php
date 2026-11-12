@@ -18,11 +18,18 @@ return [
     'stars_per_sticker' => 20,
 
     /*
-    | Text to speech. "azure" makes the server synthesize Hebrew audio (cached on disk);
+    | Text to speech. "google" or "azure" makes the server synthesize Hebrew audio (cached on disk);
     | "browser" leaves speech to the browser's built-in voices.
     */
     'tts' => [
         'driver' => env('TTS_DRIVER', 'browser'),
+
+        'google' => [
+            'key' => env('GOOGLE_TTS_KEY'),
+            'voice' => env('GOOGLE_TTS_VOICE', 'he-IL-Chirp3-HD-Aoede'),
+            // 1.0 is normal speed; a little slower suits young children.
+            'rate' => (float) env('GOOGLE_TTS_RATE', 0.9),
+        ],
 
         'azure' => [
             'key' => env('AZURE_SPEECH_KEY'),
