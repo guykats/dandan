@@ -1,0 +1,60 @@
+{
+  "node_modules/@fontsource-variable/rubik/files/rubik-arabic-wght-normal.woff2": {
+    "file": "assets/rubik-arabic-wght-normal-CGnJ-sf6.woff2",
+    "src": "node_modules/@fontsource-variable/rubik/files/rubik-arabic-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/rubik/files/rubik-cyrillic-ext-wght-normal.woff2": {
+    "file": "assets/rubik-cyrillic-ext-wght-normal-BjodpZir.woff2",
+    "src": "node_modules/@fontsource-variable/rubik/files/rubik-cyrillic-ext-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/rubik/files/rubik-cyrillic-wght-normal.woff2": {
+    "file": "assets/rubik-cyrillic-wght-normal-DveCct9I.woff2",
+    "src": "node_modules/@fontsource-variable/rubik/files/rubik-cyrillic-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/rubik/files/rubik-hebrew-wght-normal.woff2": {
+    "file": "assets/rubik-hebrew-wght-normal-BIkpbuMU.woff2",
+    "src": "node_modules/@fontsource-variable/rubik/files/rubik-hebrew-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/rubik/files/rubik-latin-ext-wght-normal.woff2": {
+    "file": "assets/rubik-latin-ext-wght-normal-OacczzuJ.woff2",
+    "src": "node_modules/@fontsource-variable/rubik/files/rubik-latin-ext-wght-normal.woff2"
+  },
+  "node_modules/@fontsource-variable/rubik/files/rubik-latin-wght-normal.woff2": {
+    "file": "assets/rubik-latin-wght-normal-CnQIisVs.woff2",
+    "src": "node_modules/@fontsource-variable/rubik/files/rubik-latin-wght-normal.woff2"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-D1sIkSZH.css",
+    "name": "app",
+    "names": [
+      "app.css"
+    ],
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "assets": [
+      "assets/rubik-arabic-wght-normal-CGnJ-sf6.woff2",
+      "assets/rubik-cyrillic-ext-wght-normal-BjodpZir.woff2",
+      "assets/rubik-cyrillic-wght-normal-DveCct9I.woff2",
+      "assets/rubik-hebrew-wght-normal-BIkpbuMU.woff2",
+      "assets/rubik-latin-ext-wght-normal-OacczzuJ.woff2",
+      "assets/rubik-latin-wght-normal-CnQIisVs.woff2"
+    ]
+  },
+  "resources/js/app.tsx": {
+    "file": "assets/app-BfzJggzt.js",
+    "name": "app",
+    "src": "resources/js/app.tsx",
+    "isEntry": true,
+    "css": [
+      "assets/app-D1sIkSZH.css"
+    ],
+    "assets": [
+      "assets/rubik-arabic-wght-normal-CGnJ-sf6.woff2",
+      "assets/rubik-cyrillic-ext-wght-normal-BjodpZir.woff2",
+      "assets/rubik-cyrillic-wght-normal-DveCct9I.woff2",
+      "assets/rubik-hebrew-wght-normal-BIkpbuMU.woff2",
+      "assets/rubik-latin-ext-wght-normal-OacczzuJ.woff2",
+      "assets/rubik-latin-wght-normal-CnQIisVs.woff2"
+    ]
+  }
+}
