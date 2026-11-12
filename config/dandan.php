@@ -33,11 +33,11 @@ return [
             'key' => env('AZURE_SPEECH_KEY'),
             'region' => env('AZURE_SPEECH_REGION'),
             'voice' => env('AZURE_SPEECH_VOICE', 'he-IL-HilaNeural'),
-            'pitch' => env('AZURE_SPEECH_PITCH', '+5%'),
+            'pitch' => env('AZURE_SPEECH_PITCH', '+0%'),
         ],
 
-        // Speaking speed for both providers: 1.0 is normal; slower suits young children.
-        'rate' => (float) env('TTS_RATE', 0.8),
+        // Speaking speed for both providers: 1.0 is normal (slower settings can sound robotic).
+        'rate' => (float) env('TTS_RATE', 1.0),
 
         // Speeds offered in the parent voice lab.
         'rates' => [1.0, 0.9, 0.8, 0.7, 0.6],

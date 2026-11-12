@@ -39,7 +39,7 @@ class GoogleSpeechTest extends TestCase
             && $request['voice']['name'] === 'he-IL-Chirp3-HD-Aoede'
             && $request['input']['text'] === 'כמה זה שלוש ועוד ארבע?'
             && $request['audioConfig']['audioEncoding'] === 'MP3'
-            && $request['audioConfig']['speakingRate'] === 0.8);
+            && $request['audioConfig']['speakingRate'] === 1.0);
     }
 
     public function test_google_error_returns_503(): void

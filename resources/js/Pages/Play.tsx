@@ -45,13 +45,15 @@ export default function Play({ roundId, station, worlds, questions }: Props) {
     const roundStars = results.filter((r, i) => r.first_choice === questions[i].answer).length;
     const showHint = question.hint.kind !== 'none' && (station.visual || wrongPicks.length > 0);
 
+    // The repeat button interrupts whatever is playing.
     const readQuestion = useCallback(() => {
-        if (question) speak(question.speech);
+        if (question) void speak(question.speech);
     }, [question]);
 
     useEffect(() => {
-        if (!summary) readQuestion();
-    }, [readQuestion, summary]);
+        // Wait for the previous sentence (praise, station name) to finish instead of cutting it off.
+        if (!summary && question) void speak(question.speech, { queue: true });
+    }, [question, summary]);
 
     useEffect(() => () => stopSpeaking(), []);
 
@@ -66,7 +68,7 @@ export default function Play({ roundId, station, worlds, questions }: Props) {
             setSummary(data);
             setMood('cheer');
             if (data.passed) playFanfare();
-            speak(summarySpeech(data, worlds));
+            void speak(summarySpeech(data, worlds), { queue: true });
         } catch {
             setSaveFailed(true);
         }
