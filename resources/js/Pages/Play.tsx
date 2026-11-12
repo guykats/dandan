@@ -204,9 +204,14 @@ export default function Play({ roundId, station, worlds, questions }: Props) {
 
 function summarySpeech(data: RoundSummary, worlds: World[]): string {
     if (data.journey_completed) return 'וואו! סיימת את כל המסע של דנדן! אתה אלוף החשבון!';
-    if (!data.passed) return `אספת ${data.correct} תשובות נכונות. כמעט! עוד ניסיון ונפתח את התחנה הבאה.`;
+    if (!data.passed) {
+        const answers = data.correct === 1 ? 'תשובה נכונה אחת' : `${data.correct} תשובות נכונות`;
+        return `אספת ${answers}. כמעט! עוד ניסיון ונפתח את התחנה הבאה.`;
+    }
 
-    const lines = [`כל הכבוד! קיבלת ${data.rating} ${data.rating === 1 ? 'כוכב' : 'כוכבים'} בתחנה.`];
+    // "כוכב" is masculine, so its number is spelled here rather than left to the speech engine.
+    const stars = ['', 'כוכב אחד', 'שני כוכבים', 'שלושה כוכבים'][data.rating];
+    const lines = [`כל הכבוד! קיבלת ${stars} בתחנה.`];
     if (data.world_completed !== null && worlds[data.world_completed + 1]) {
         lines.push(`פתחת עולם חדש: ${worlds[data.world_completed + 1].name}!`);
     } else if (data.first_pass && data.next_station) {

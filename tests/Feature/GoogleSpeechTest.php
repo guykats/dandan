@@ -37,7 +37,7 @@ class GoogleSpeechTest extends TestCase
         Http::assertSent(fn ($request) => $request->hasHeader('X-Goog-Api-Key', 'g-key')
             && $request['voice']['languageCode'] === 'he-IL'
             && $request['voice']['name'] === 'he-IL-Chirp3-HD-Aoede'
-            && $request['input']['text'] === 'כמה זה 3 ועוד 4?'
+            && $request['input']['text'] === 'כמה זה שָׁלוֹשׁ ועוד אַרְבַּע?'
             && $request['audioConfig']['audioEncoding'] === 'MP3');
     }
 
