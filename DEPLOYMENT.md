@@ -79,6 +79,27 @@ ln -s app/public public_html
 לפתוח את https://dandan.guykats.com. אמור להופיע דנדן הנשר.
 אם משהו לא עובד: `~/domains/dandan.guykats.com/app/storage/logs/laravel.log`.
 
+## הקראה בעברית (Azure)
+
+השרת מייצר את הקול בעזרת Azure AI Speech ושומר כל משפט ב-`storage/app/private/tts`, כך שכל משפט נשלח ל-Azure פעם אחת בלבד.
+בלי הגדרה, או אם Azure לא זמין, האפליקציה חוזרת לקול של הדפדפן.
+
+1. ב-[Azure Portal](https://portal.azure.com) → **Create a resource** → מחפשים **Speech** → **Create**.
+2. ממלאים: Resource group חדש (למשל `dandan`), Region: **West Europe**, שם כלשהו, ו-Pricing tier: **Free F0**.
+3. **Review + create** → **Create**. בסיום: **Go to resource** → **Keys and Endpoint**.
+4. מעתיקים את **KEY 1** ואת **Location/Region** (למשל `westeurope`) ל-`.env` בשרת:
+
+```
+TTS_DRIVER=azure
+AZURE_SPEECH_KEY=...           # KEY 1
+AZURE_SPEECH_REGION=westeurope
+AZURE_SPEECH_VOICE=he-IL-HilaNeural   # or he-IL-AvriNeural for a male voice
+```
+
+5. `php artisan config:cache`, ואז באזור ההורים אמור להופיע "הקראה מהשרת (Azure)". לוחצים "בדיקת קול".
+
+בשכבה F0 אין חיוב: כשמגיעים למכסה החודשית השירות פשוט מפסיק לענות, והאפליקציה עוברת לקול של הדפדפן עד החודש הבא.
+
 ## פריסות אוטומטיות
 
 בכל push ל-`main`:

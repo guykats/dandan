@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
-import { hebrewVoice, isSpeechSupported, onVoicesReady, speak } from '../lib/speech';
+import { getServerVoice, hebrewVoice, isSpeechSupported, onVoicesReady, speak } from '../lib/speech';
 import type { World } from '../types';
 
 interface OperationStats {
@@ -102,6 +102,19 @@ function VoiceCheck() {
         update();
         return onVoicesReady(update);
     }, []);
+
+    const server = getServerVoice();
+
+    if (server) {
+        return (
+            <div className="flex flex-wrap items-center gap-4">
+                <p className="text-emerald-700">✓ הקראה מהשרת (Azure), קול: {server.replace('he-IL-', '').replace('Neural', '')}</p>
+                <button type="button" onClick={() => speak('כמה זה שלוש ועוד ארבע?', { force: true })} className="rounded-xl bg-sky-600 px-4 py-2 font-semibold text-white hover:bg-sky-700">
+                    בדיקת קול
+                </button>
+            </div>
+        );
+    }
 
     if (!isSpeechSupported()) {
         return <p className="text-rose-700">הדפדפן הזה לא תומך בהקראה.</p>;

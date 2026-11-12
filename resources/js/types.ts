@@ -8,6 +8,7 @@ export interface Kid {
 export interface SharedProps {
     kid: Kid;
     starsPerSticker: number;
+    serverVoice: string | null;
     errors: Record<string, string>;
     [key: string]: unknown;
 }

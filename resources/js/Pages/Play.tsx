@@ -9,7 +9,7 @@ import Star from '../Components/Star';
 import { StickerArt, STICKERS } from '../Components/StickerArt';
 import { postJson } from '../lib/http';
 import { playCorrect, playFanfare, playWrong } from '../lib/sfx';
-import { phrases, speak, stopSpeaking } from '../lib/speech';
+import { PHRASES, phrases, prefetchSpeech, speak, stopSpeaking } from '../lib/speech';
 import type { Question, RoundSummary, StationInfo, World } from '../types';
 
 interface Props {
@@ -50,6 +50,11 @@ export default function Play({ roundId, station, worlds, questions }: Props) {
     }, [readQuestion, summary]);
 
     useEffect(() => () => stopSpeaking(), []);
+
+    // Fetch this round's sentences ahead of time so each one plays without a delay.
+    useEffect(() => {
+        prefetchSpeech([...questions.map((q) => q.speech), ...PHRASES.correct, ...PHRASES.tryAgain]);
+    }, [questions]);
 
     const finishRound = async (all: Result[]) => {
         try {

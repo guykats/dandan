@@ -4,9 +4,12 @@ use App\Http\Controllers\DeployWebhookController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ParentController;
 use App\Http\Controllers\PlayController;
+use App\Http\Controllers\SpeechController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/deploy-webhook', [DeployWebhookController::class, 'handle'])->name('deploy-webhook');
+
+Route::get('/tts', [SpeechController::class, 'show'])->middleware('throttle:120,1')->name('tts');
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/journey', [HomeController::class, 'journey'])->name('journey');
