@@ -27,18 +27,20 @@ return [
         'google' => [
             'key' => env('GOOGLE_TTS_KEY'),
             'voice' => env('GOOGLE_TTS_VOICE', 'he-IL-Chirp3-HD-Aoede'),
-            // 1.0 is normal speed; a little slower suits young children.
-            'rate' => (float) env('GOOGLE_TTS_RATE', 0.9),
         ],
 
         'azure' => [
             'key' => env('AZURE_SPEECH_KEY'),
             'region' => env('AZURE_SPEECH_REGION'),
             'voice' => env('AZURE_SPEECH_VOICE', 'he-IL-HilaNeural'),
-            // A little slower and brighter than the default suits young children.
-            'rate' => env('AZURE_SPEECH_RATE', '-10%'),
             'pitch' => env('AZURE_SPEECH_PITCH', '+5%'),
         ],
+
+        // Speaking speed for both providers: 1.0 is normal; slower suits young children.
+        'rate' => (float) env('TTS_RATE', 0.8),
+
+        // Speeds offered in the parent voice lab.
+        'rates' => [1.0, 0.9, 0.8, 0.7, 0.6],
 
         // How numbers are sent to the engine: digits, words (no vowel marks) or nikud (with vowel marks).
         'numbers' => env('TTS_NUMBERS', 'words'),

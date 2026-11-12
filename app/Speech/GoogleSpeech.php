@@ -11,7 +11,6 @@ class GoogleSpeech implements SpeechSynthesizer
     public function __construct(
         private string $key,
         private string $voice,
-        private float $rate,
     ) {}
 
     public static function fromConfig(): ?self
@@ -22,7 +21,7 @@ class GoogleSpeech implements SpeechSynthesizer
             return null;
         }
 
-        return new self($config['key'], $config['voice'], (float) $config['rate']);
+        return new self($config['key'], $config['voice']);
     }
 
     public function voice(): string
@@ -50,7 +49,7 @@ class GoogleSpeech implements SpeechSynthesizer
         ]));
     }
 
-    public function synthesize(string $text, ?string $voice = null): string
+    public function synthesize(string $text, ?string $voice = null, float $rate = 1.0): string
     {
         $voice ??= $this->voice;
         // The language code is the voice name's prefix, e.g. "he-IL" in "he-IL-Chirp3-HD-Aoede".
@@ -61,7 +60,7 @@ class GoogleSpeech implements SpeechSynthesizer
             ->post('https://texttospeech.googleapis.com/v1/text:synthesize', [
                 'input' => ['text' => $text],
                 'voice' => ['languageCode' => $languageCode, 'name' => $voice],
-                'audioConfig' => ['audioEncoding' => 'MP3', 'speakingRate' => $this->rate],
+                'audioConfig' => ['audioEncoding' => 'MP3', 'speakingRate' => $rate],
             ]);
 
         $audio = $response->successful() ? base64_decode((string) $response->json('audioContent'), true) : false;

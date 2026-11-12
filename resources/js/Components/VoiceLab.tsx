@@ -4,6 +4,8 @@ export interface VoiceLabProps {
     voices: string[];
     defaultVoice: string;
     defaultMode: string;
+    rates: number[];
+    defaultRate: number;
 }
 
 const MODES: { id: string; label: string; example: string }[] = [
@@ -17,11 +19,12 @@ function voiceLabel(voice: string): string {
 }
 
 /** Lets the parent compare voices and number-reading modes before choosing the .env settings. */
-export default function VoiceLab({ voices, defaultVoice, defaultMode }: VoiceLabProps) {
+export default function VoiceLab({ voices, defaultVoice, defaultMode, rates, defaultRate }: VoiceLabProps) {
     const [text, setText] = useState('כמה זה 7 ועוד 5? 13 פחות 8 זה 5. השלמה ל-10.');
     const [voice, setVoice] = useState(defaultVoice);
     const [status, setStatus] = useState<string | null>(null);
     const [mode, setMode] = useState(defaultMode);
+    const [rate, setRate] = useState(defaultRate);
     const [copied, setCopied] = useState(false);
     const audio = useRef<HTMLAudioElement | null>(null);
 
@@ -29,7 +32,7 @@ export default function VoiceLab({ voices, defaultVoice, defaultMode }: VoiceLab
         setMode(selectedMode);
         setCopied(false);
         audio.current?.pause();
-        const url = `/tts?t=${encodeURIComponent(text.trim())}&m=${selectedMode}&v=${encodeURIComponent(voice)}`;
+        const url = `/tts?t=${encodeURIComponent(text.trim())}&m=${selectedMode}&v=${encodeURIComponent(voice)}&r=${rate}`;
         const a = new Audio(url);
         audio.current = a;
         setStatus('טוען…');
@@ -38,7 +41,7 @@ export default function VoiceLab({ voices, defaultVoice, defaultMode }: VoiceLab
         a.play().catch(() => {});
     };
 
-    const envLines = `${voice.endsWith('Neural') ? 'AZURE_SPEECH_VOICE' : 'GOOGLE_TTS_VOICE'}=${voice}\nTTS_NUMBERS=${mode}`;
+    const envLines = `${voice.endsWith('Neural') ? 'AZURE_SPEECH_VOICE' : 'GOOGLE_TTS_VOICE'}=${voice}\nTTS_NUMBERS=${mode}\nTTS_RATE=${rate}`;
 
     const copy = async () => {
         try {
@@ -58,7 +61,7 @@ export default function VoiceLab({ voices, defaultVoice, defaultMode }: VoiceLab
     return (
         <div className="flex flex-col gap-3">
             <p className="text-sm text-slate-500 select-text">
-                כאן משווים קולות ודרכי קריאה של מספרים. אחרי שבוחרים, מעדכנים ב-<code dir="ltr">.env</code> בשרת את <code dir="ltr">GOOGLE_TTS_VOICE</code> ו-<code dir="ltr">TTS_NUMBERS</code>
+                כאן משווים קולות ודרכי קריאה של מספרים. אחרי שבוחרים, מעדכנים ב-<code dir="ltr">.env</code> בשרת את השורות שבתיבה למטה
                 {' '}ומריצים <code dir="ltr">php artisan config:cache</code>.
             </p>
             <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2} maxLength={160} className="rounded-xl border border-slate-300 p-3" aria-label="טקסט לבדיקה" />
@@ -69,6 +72,17 @@ export default function VoiceLab({ voices, defaultVoice, defaultMode }: VoiceLab
                         <option key={v} value={v}>
                             {voiceLabel(v)}
                             {v === defaultVoice ? ' (current)' : ''}
+                        </option>
+                    ))}
+                </select>
+            </label>
+            <label className="flex items-center gap-2">
+                <span className="text-sm font-medium">מהירות:</span>
+                <select value={rate} onChange={(e) => setRate(Number(e.target.value))} className="rounded-xl border border-slate-300 bg-white px-3 py-2">
+                    {rates.map((r) => (
+                        <option key={r} value={r}>
+                            {r === 1 ? 'רגילה (1.0)' : `${r} (${Math.round((1 - r) * 100)}% לאט יותר)`}
+                            {r === defaultRate ? ' · נוכחי' : ''}
                         </option>
                     ))}
                 </select>

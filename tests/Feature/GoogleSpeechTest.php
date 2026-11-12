@@ -38,7 +38,8 @@ class GoogleSpeechTest extends TestCase
             && $request['voice']['languageCode'] === 'he-IL'
             && $request['voice']['name'] === 'he-IL-Chirp3-HD-Aoede'
             && $request['input']['text'] === 'כמה זה שלוש ועוד ארבע?'
-            && $request['audioConfig']['audioEncoding'] === 'MP3');
+            && $request['audioConfig']['audioEncoding'] === 'MP3'
+            && $request['audioConfig']['speakingRate'] === 0.8);
     }
 
     public function test_google_error_returns_503(): void
@@ -92,5 +93,27 @@ class GoogleSpeechTest extends TestCase
 
         $this->get('/tts?t='.urlencode('שלום').'&v=he-IL-Standard-D')->assertStatus(503);
         $this->get('/tts?t='.urlencode('שלום'))->assertOk();
+    }
+
+    public function test_speed_can_be_chosen_and_is_cached_separately(): void
+    {
+        Http::fake(['*' => Http::response(['audioContent' => base64_encode('MP3DATA')])]);
+
+        $this->get('/tts?t='.urlencode('שלום').'&r=0.6')->assertOk();
+        $this->get('/tts?t='.urlencode('שלום').'&r=1')->assertOk();
+        $this->get('/tts?t='.urlencode('שלום').'&r=0.6')->assertOk();
+
+        Http::assertSentCount(2);
+        Http::assertSent(fn ($r) => $r['audioConfig']['speakingRate'] === 0.6);
+        Http::assertSent(fn ($r) => $r['audioConfig']['speakingRate'] === 1.0);
+    }
+
+    public function test_rejects_speeds_outside_the_list(): void
+    {
+        Http::fake();
+
+        $this->get('/tts?t='.urlencode('שלום').'&r=3')->assertStatus(422);
+        $this->get('/tts?t='.urlencode('שלום').'&r=0.1')->assertStatus(422);
+        Http::assertNothingSent();
     }
 }

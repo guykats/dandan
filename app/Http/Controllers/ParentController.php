@@ -100,6 +100,8 @@ class ParentController extends Controller
                 'voices' => $tts->availableVoices(),
                 'defaultVoice' => $tts->voice(),
                 'defaultMode' => config('dandan.tts.numbers'),
+                'rates' => config('dandan.tts.rates'),
+                'defaultRate' => (float) config('dandan.tts.rate'),
             ] : null,
         ]);
     }

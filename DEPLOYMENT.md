@@ -102,7 +102,8 @@ GOOGLE_TTS_VOICE=he-IL-Chirp3-HD-Aoede   # see voices below
 
 **החלפת קול:** הקולות של Chirp 3 HD נקראים `he-IL-Chirp3-HD-<שם>`, למשל Aoede, Kore או Leda (נשיים), Puck או Charon (גבריים).
 את הרשימה המלאה אפשר לשמוע בדף ההדגמה של Google. אחרי שינוי מריצים שוב `php artisan config:cache`.
-אם קול כלשהו מחזיר שגיאה, אפשר לנסות `GOOGLE_TTS_RATE=1`, או קול ותיק יותר כמו `he-IL-Wavenet-A`.
+**מהירות:** `TTS_RATE` (ברירת מחדל 0.8, כלומר 20% לאט מהרגיל; 1.0 זו מהירות רגילה). במעבדת הקול באזור ההורים אפשר לנסות מהירויות שונות.
+אם קול כלשהו מחזיר שגיאה, אפשר לנסות `TTS_RATE=1`, או קול ותיק יותר כמו `he-IL-Wavenet-A`.
 
 **חלופה: Azure.** מגדירים `TTS_DRIVER=azure` עם `AZURE_SPEECH_KEY` ו-`AZURE_SPEECH_REGION` (משאב Speech בשכבה Free F0).
 

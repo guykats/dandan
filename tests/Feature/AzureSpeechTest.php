@@ -35,6 +35,7 @@ class AzureSpeechTest extends TestCase
         Http::assertSentCount(1);
         Http::assertSent(fn ($request) => $request->hasHeader('Ocp-Apim-Subscription-Key', 'test-key')
             && str_contains($request->body(), 'he-IL-HilaNeural')
+            && str_contains($request->body(), 'rate="-20%"')
             && str_contains($request->body(), 'כמה זה שלוש ועוד ארבע?'));
     }
 

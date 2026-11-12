@@ -12,7 +12,6 @@ class AzureSpeech implements SpeechSynthesizer
         private string $key,
         private string $region,
         private string $voice,
-        private string $rate,
         private string $pitch,
     ) {}
 
@@ -24,7 +23,7 @@ class AzureSpeech implements SpeechSynthesizer
             return null;
         }
 
-        return new self($config['key'], $config['region'], $config['voice'], $config['rate'], $config['pitch']);
+        return new self($config['key'], $config['region'], $config['voice'], $config['pitch']);
     }
 
     public function voice(): string
@@ -38,14 +37,15 @@ class AzureSpeech implements SpeechSynthesizer
     }
 
     /** Returns MP3 bytes. */
-    public function synthesize(string $text, ?string $voice = null): string
+    public function synthesize(string $text, ?string $voice = null, float $rate = 1.0): string
     {
         $voice ??= $this->voice;
         $ssml = sprintf(
             '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="he-IL">'
             .'<voice name="%s"><prosody rate="%s" pitch="%s">%s</prosody></voice></speak>',
             htmlspecialchars($voice, ENT_XML1 | ENT_QUOTES),
-            htmlspecialchars($this->rate, ENT_XML1 | ENT_QUOTES),
+            // Azure takes the rate as a relative percentage, e.g. 0.8 -> "-20%".
+            sprintf('%+d%%', (int) round(($rate - 1) * 100)),
             htmlspecialchars($this->pitch, ENT_XML1 | ENT_QUOTES),
             htmlspecialchars($text, ENT_XML1 | ENT_QUOTES),
         );

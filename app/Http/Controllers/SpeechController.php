@@ -27,9 +27,16 @@ class SpeechController extends Controller
         // Optional overrides used by the voice lab in the parent area.
         $mode = (string) $request->query('m', config('dandan.tts.numbers'));
         $voice = (string) $request->query('v', $tts->voice());
-        abort_unless(in_array($mode, HebrewNumbers::MODES, true) && in_array($voice, $tts->availableVoices(), true), 422);
+        $rate = (float) $request->query('r', config('dandan.tts.rate'));
+        $allowedRates = array_map('floatval', [...config('dandan.tts.rates'), config('dandan.tts.rate')]);
+        abort_unless(
+            in_array($mode, HebrewNumbers::MODES, true)
+            && in_array($voice, $tts->availableVoices(), true)
+            && in_array($rate, $allowedRates, true),
+            422,
+        );
 
-        $path = "tts/{$voice}/{$mode}/".sha1($text).'.mp3';
+        $path = "tts/{$voice}/{$mode}/r".number_format($rate, 2).'/'.sha1($text).'.mp3';
         $disk = Storage::disk('local');
 
         if (! $disk->exists($path)) {
@@ -44,7 +51,7 @@ class SpeechController extends Controller
             }
 
             try {
-                $disk->put($path, $tts->synthesize(HebrewNumbers::spell($text, $mode), $voice));
+                $disk->put($path, $tts->synthesize(HebrewNumbers::spell($text, $mode), $voice, $rate));
             } catch (Throwable $e) {
                 Log::warning('TTS synthesis failed', ['voice' => $voice, 'error' => $e->getMessage()]);
                 Cache::put($downKey, true, now()->addMinutes(5));
