@@ -21,11 +21,15 @@ export default function VoiceLab({ voices, defaultVoice, defaultMode }: VoiceLab
     const [text, setText] = useState('כמה זה 7 ועוד 5? 13 פחות 8 זה 5. השלמה ל-10.');
     const [voice, setVoice] = useState(defaultVoice);
     const [status, setStatus] = useState<string | null>(null);
+    const [mode, setMode] = useState(defaultMode);
+    const [copied, setCopied] = useState(false);
     const audio = useRef<HTMLAudioElement | null>(null);
 
-    const play = (mode: string) => {
+    const play = (selectedMode: string) => {
+        setMode(selectedMode);
+        setCopied(false);
         audio.current?.pause();
-        const url = `/tts?t=${encodeURIComponent(text.trim())}&m=${mode}&v=${encodeURIComponent(voice)}`;
+        const url = `/tts?t=${encodeURIComponent(text.trim())}&m=${selectedMode}&v=${encodeURIComponent(voice)}`;
         const a = new Audio(url);
         audio.current = a;
         setStatus('טוען…');
@@ -34,9 +38,26 @@ export default function VoiceLab({ voices, defaultVoice, defaultMode }: VoiceLab
         a.play().catch(() => {});
     };
 
+    const envLines = `${voice.endsWith('Neural') ? 'AZURE_SPEECH_VOICE' : 'GOOGLE_TTS_VOICE'}=${voice}\nTTS_NUMBERS=${mode}`;
+
+    const copy = async () => {
+        try {
+            await navigator.clipboard.writeText(envLines);
+        } catch {
+            // Fallback for browsers without clipboard access: copy via a temporary textarea.
+            const el = document.createElement('textarea');
+            el.value = envLines;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            el.remove();
+        }
+        setCopied(true);
+    };
+
     return (
         <div className="flex flex-col gap-3">
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-500 select-text">
                 כאן משווים קולות ודרכי קריאה של מספרים. אחרי שבוחרים, מעדכנים ב-<code dir="ltr">.env</code> בשרת את <code dir="ltr">GOOGLE_TTS_VOICE</code> ו-<code dir="ltr">TTS_NUMBERS</code>
                 {' '}ומריצים <code dir="ltr">php artisan config:cache</code>.
             </p>
@@ -60,9 +81,13 @@ export default function VoiceLab({ voices, defaultVoice, defaultMode }: VoiceLab
                 ))}
             </div>
             {status && <p className="text-sm text-amber-700">{status}</p>}
-            <p className="text-xs text-slate-500" dir="ltr">
-                .env → GOOGLE_TTS_VOICE={voice} · TTS_NUMBERS=…
-            </p>
+            <div className="flex flex-col gap-2">
+                <span className="text-sm font-medium">השורות להעתקה ל-.env (לפי הקול והכפתור האחרון שהשמעת):</span>
+                <pre dir="ltr" className="overflow-x-auto rounded-xl bg-slate-900 p-3 text-left text-sm text-slate-100 select-text">{envLines}</pre>
+                <button type="button" onClick={copy} className="self-start rounded-xl bg-slate-200 px-4 py-2 font-semibold hover:bg-slate-300">
+                    {copied ? '✓ הועתק' : 'העתקה'}
+                </button>
+            </div>
         </div>
     );
 }

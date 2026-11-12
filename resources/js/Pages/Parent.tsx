@@ -152,7 +152,7 @@ export default function Parent({ profile, journey, worlds, stats, unlockMinutes,
     const [unlockTarget, setUnlockTarget] = useState(journey.current);
 
     return (
-        <div className="min-h-screen bg-slate-100 text-slate-900">
+        <div className="min-h-screen bg-slate-100 text-slate-900 select-text">
             <Head title="אזור הורים" />
             <div className="mx-auto max-w-5xl px-6 py-8">
                 <header className="mb-6 flex items-center justify-between">
