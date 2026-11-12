@@ -8,6 +8,7 @@ use App\Models\Attempt;
 use App\Models\KidProfile;
 use App\Models\Round;
 use App\Models\StationProgress;
+use App\Speech\Speech;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -95,6 +96,11 @@ class ParentController extends Controller
                 'recentRounds' => $recentRounds,
             ],
             'unlockMinutes' => (int) config('dandan.parent_unlock_minutes'),
+            'voiceLab' => ($tts = Speech::fromConfig()) ? [
+                'voices' => $tts->availableVoices(),
+                'defaultVoice' => $tts->voice(),
+                'defaultMode' => config('dandan.tts.numbers'),
+            ] : null,
         ]);
     }
 

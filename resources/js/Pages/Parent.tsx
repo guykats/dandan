@@ -2,6 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { getServerVoice, hebrewVoice, isSpeechSupported, onVoicesReady, speak } from '../lib/speech';
 import type { World } from '../types';
+import VoiceLab, { type VoiceLabProps } from '../Components/VoiceLab';
 
 interface OperationStats {
     total: number;
@@ -35,6 +36,7 @@ interface Props {
         recentRounds: RecentRound[];
     };
     unlockMinutes: number;
+    voiceLab: VoiceLabProps | null;
 }
 
 function percent(s?: OperationStats): string {
@@ -145,7 +147,7 @@ const SKILLS: { key: string; label: string }[] = [
     { key: 'sequence', label: 'סדרות' },
 ];
 
-export default function Parent({ profile, journey, worlds, stats, unlockMinutes }: Props) {
+export default function Parent({ profile, journey, worlds, stats, unlockMinutes, voiceLab }: Props) {
     const [confirmReset, setConfirmReset] = useState(false);
     const [unlockTarget, setUnlockTarget] = useState(journey.current);
 
@@ -254,6 +256,13 @@ export default function Parent({ profile, journey, worlds, stats, unlockMinutes 
                             <h2 className="mb-2 text-lg font-semibold">הקראה</h2>
                             <VoiceCheck />
                         </div>
+
+                        {voiceLab && (
+                            <div>
+                                <h2 className="mb-2 text-lg font-semibold">מעבדת קול</h2>
+                                <VoiceLab {...voiceLab} />
+                            </div>
+                        )}
 
                         <div>
                             <h2 className="mb-2 text-lg font-semibold">איפוס</h2>

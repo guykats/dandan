@@ -37,7 +37,7 @@ class GoogleSpeechTest extends TestCase
         Http::assertSent(fn ($request) => $request->hasHeader('X-Goog-Api-Key', 'g-key')
             && $request['voice']['languageCode'] === 'he-IL'
             && $request['voice']['name'] === 'he-IL-Chirp3-HD-Aoede'
-            && $request['input']['text'] === 'כמה זה שָׁלוֹשׁ ועוד אַרְבַּע?'
+            && $request['input']['text'] === 'כמה זה שלוש ועוד ארבע?'
             && $request['audioConfig']['audioEncoding'] === 'MP3');
     }
 
@@ -60,5 +60,37 @@ class GoogleSpeechTest extends TestCase
 
         $this->get('/tts?t='.urlencode('שלום'))->assertNotFound();
         $this->get('/')->assertInertia(fn (Assert $page) => $page->where('serverVoice', null));
+    }
+
+    public function test_voice_lab_can_pick_mode_and_voice(): void
+    {
+        Http::fake(['*' => Http::response(['audioContent' => base64_encode('MP3DATA')])]);
+
+        $this->get('/tts?t='.urlencode('כמה זה 7?').'&m=digits&v=he-IL-Wavenet-B')->assertOk();
+        $this->get('/tts?t='.urlencode('כמה זה 7?').'&m=nikud')->assertOk();
+
+        Http::assertSent(fn ($r) => $r['voice']['name'] === 'he-IL-Wavenet-B' && $r['input']['text'] === 'כמה זה 7?');
+        Http::assertSent(fn ($r) => $r['voice']['name'] === 'he-IL-Chirp3-HD-Aoede' && $r['input']['text'] === 'כמה זה שֶׁבַע?');
+    }
+
+    public function test_rejects_unknown_voice_or_mode(): void
+    {
+        Http::fake();
+
+        $this->get('/tts?t='.urlencode('שלום').'&v=en-US-Evil')->assertStatus(422);
+        $this->get('/tts?t='.urlencode('שלום').'&m=shout')->assertStatus(422);
+        Http::assertNothingSent();
+    }
+
+    public function test_a_failing_voice_does_not_block_other_voices(): void
+    {
+        Http::fake(function ($request) {
+            return $request['voice']['name'] === 'he-IL-Standard-D'
+                ? Http::response(['error' => ['message' => 'voice not found']], 400)
+                : Http::response(['audioContent' => base64_encode('MP3DATA')]);
+        });
+
+        $this->get('/tts?t='.urlencode('שלום').'&v=he-IL-Standard-D')->assertStatus(503);
+        $this->get('/tts?t='.urlencode('שלום'))->assertOk();
     }
 }

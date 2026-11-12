@@ -40,6 +40,9 @@ return [
             'pitch' => env('AZURE_SPEECH_PITCH', '+5%'),
         ],
 
+        // How numbers are sent to the engine: digits, words (no vowel marks) or nikud (with vowel marks).
+        'numbers' => env('TTS_NUMBERS', 'words'),
+
         // Longest sentence the endpoint will synthesize.
         'max_length' => 160,
 

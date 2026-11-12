@@ -54,17 +54,40 @@ class HebrewNumbers
         return null;
     }
 
-    /** Replace every number in the text with its Hebrew word, including prefixed forms like "ל-10". */
-    public static function spell(string $text): string
+    public const MODES = ['digits', 'words', 'nikud'];
+
+    /**
+     * Prepare numbers for the speech engine.
+     *   digits  leave numbers as they are
+     *   words   Hebrew words without vowel marks (e.g. "שבע")
+     *   nikud   Hebrew words with vowel marks (e.g. "שֶׁבַע")
+     * Prefixed forms like "ל-10" become "לעשר" in both word modes.
+     */
+    public static function spell(string $text, string $mode = 'words'): string
     {
+        if ($mode === 'digits') {
+            return $text;
+        }
+
         return preg_replace_callback(
             '/(?:(?<prefix>[בהוכלמש])-)?(?<n>\d+)/u',
-            function (array $m) {
+            function (array $m) use ($mode) {
                 $word = self::word((int) $m['n']);
+                if ($word === null) {
+                    return $m[0];
+                }
+                if ($mode !== 'nikud') {
+                    $word = self::stripNikud($word);
+                }
 
-                return $word === null ? $m[0] : ($m['prefix'] ?? '').$word;
+                return ($m['prefix'] ?? '').$word;
             },
             $text,
         );
+    }
+
+    public static function stripNikud(string $text): string
+    {
+        return preg_replace('/[\x{0591}-\x{05C7}]/u', '', $text);
     }
 }

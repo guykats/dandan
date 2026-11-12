@@ -32,13 +32,19 @@ class AzureSpeech implements SpeechSynthesizer
         return $this->voice;
     }
 
-    /** Returns MP3 bytes. */
-    public function synthesize(string $text): string
+    public function availableVoices(): array
     {
+        return array_values(array_unique([$this->voice, 'he-IL-HilaNeural', 'he-IL-AvriNeural']));
+    }
+
+    /** Returns MP3 bytes. */
+    public function synthesize(string $text, ?string $voice = null): string
+    {
+        $voice ??= $this->voice;
         $ssml = sprintf(
             '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="he-IL">'
             .'<voice name="%s"><prosody rate="%s" pitch="%s">%s</prosody></voice></speak>',
-            htmlspecialchars($this->voice, ENT_XML1 | ENT_QUOTES),
+            htmlspecialchars($voice, ENT_XML1 | ENT_QUOTES),
             htmlspecialchars($this->rate, ENT_XML1 | ENT_QUOTES),
             htmlspecialchars($this->pitch, ENT_XML1 | ENT_QUOTES),
             htmlspecialchars($text, ENT_XML1 | ENT_QUOTES),

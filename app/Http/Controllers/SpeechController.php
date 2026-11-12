@@ -24,13 +24,18 @@ class SpeechController extends Controller
         // Only short Hebrew game sentences: Hebrew letters, digits, spaces, basic punctuation and math signs.
         abort_unless($text !== '' && mb_strlen($text) <= $max && preg_match('/^[\x{0590}-\x{05FF}\x{2014}0-9\s.,!?:\-+=׳״"\'()]+$/u', $text), 422);
 
-        // v2: numbers are spelled out as vocalized Hebrew words before synthesis.
-        $path = 'tts/'.$tts->voice().'/v2/'.sha1($text).'.mp3';
+        // Optional overrides used by the voice lab in the parent area.
+        $mode = (string) $request->query('m', config('dandan.tts.numbers'));
+        $voice = (string) $request->query('v', $tts->voice());
+        abort_unless(in_array($mode, HebrewNumbers::MODES, true) && in_array($voice, $tts->availableVoices(), true), 422);
+
+        $path = "tts/{$voice}/{$mode}/".sha1($text).'.mp3';
         $disk = Storage::disk('local');
 
         if (! $disk->exists($path)) {
-            // After a failure, skip Azure for a few minutes so the browser falls back to its own voice right away.
-            abort_if(Cache::has('tts-down'), 503);
+            // After a failure, skip this voice for a few minutes so the browser falls back to its own voice right away.
+            $downKey = "tts-down:{$voice}";
+            abort_if(Cache::has($downKey), 503);
 
             $key = 'tts-new:'.now()->toDateString();
             Cache::add($key, 0, now()->addDay());
@@ -39,10 +44,10 @@ class SpeechController extends Controller
             }
 
             try {
-                $disk->put($path, $tts->synthesize(HebrewNumbers::spell($text)));
+                $disk->put($path, $tts->synthesize(HebrewNumbers::spell($text, $mode), $voice));
             } catch (Throwable $e) {
-                Log::warning('TTS synthesis failed', ['error' => $e->getMessage()]);
-                Cache::put('tts-down', true, now()->addMinutes(5));
+                Log::warning('TTS synthesis failed', ['voice' => $voice, 'error' => $e->getMessage()]);
+                Cache::put($downKey, true, now()->addMinutes(5));
                 abort(503);
             }
         }
